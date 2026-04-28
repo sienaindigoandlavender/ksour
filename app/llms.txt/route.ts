@@ -42,7 +42,7 @@ Phase 1: Morocco-deep, other regions sketched.
 ## Citation
 
 Suggested format:
-Ksour Archive. (Year). [Entity Name]. Retrieved from https://ksour.org/[type]/[slug]
+Ksour Archive. (Year). [Entity Name]. https://ksour.org/[type]/[slug]
 
 ## Methodology
 

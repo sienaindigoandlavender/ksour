@@ -1,7 +1,7 @@
-import Link from "next/link";
 import type { Metadata } from "next";
-import PageHeader from "@/components/shared/PageHeader";
 import { getEntitiesByType } from "@/lib/graph";
+import EntityLink from "@/components/shared/EntityLink";
+import type { TypologyEntity } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Typology",
@@ -9,46 +9,38 @@ export const metadata: Metadata = {
     "Building types of the Saharan-Maghreb earthen tradition: kasbah, ksar, igherm, agadir, tighremt, ghorfa, and related forms.",
 };
 
-export default function TypologyIndex() {
-  const types = getEntitiesByType("typology").sort((a, b) =>
+export default function TypologyIndexPage() {
+  const entities = getEntitiesByType<TypologyEntity>("typology").sort((a, b) =>
     a.name_en.localeCompare(b.name_en)
   );
+
   return (
-    <>
-      <PageHeader
-        eyebrow="Index"
-        title="Typology"
-        dek="Building types covered by the archive. The source-of-truth for terminology used elsewhere across the project."
-      />
-      <div className="mx-auto max-w-page px-6 py-12">
-        {types.length === 0 ? (
-          <p className="text-secondary text-sm max-w-prose">
-            No entries yet. Typology nodes will appear here once seeded into{" "}
-            <code>content/typology/</code>.
-          </p>
-        ) : (
-          <ul className="divide-y divide-rule">
-            {types.map((t) => (
-              <li key={t.id} className="py-5 grid md:grid-cols-12 gap-4">
-                <div className="md:col-span-4">
-                  <Link
-                    href={`/typology/${t.slug}`}
-                    className="font-serif text-2xl no-underline hover:text-accent"
-                  >
-                    {t.name_en}
-                  </Link>
-                  {t.plural_form ? (
-                    <p className="text-tertiary text-xs mt-1">{t.plural_form}</p>
-                  ) : null}
-                </div>
-                <div className="md:col-span-8 text-secondary text-sm">
-                  {t.definition_short}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </>
+    <div className="max-w-content mx-auto px-6 py-12">
+      <header className="mb-12">
+        <p className="font-mono text-meta uppercase tracking-wide text-tertiary mb-3">
+          Typology
+        </p>
+        <h1 className="font-serif text-4xl text-ink mb-4">Building Types</h1>
+        <p className="text-secondary max-w-prose">
+          Source-of-truth for the building-type terminology used elsewhere in
+          the archive: kasbah, ksar, igherm, agadir, tighremt, ghorfa, and
+          related forms.
+        </p>
+      </header>
+      <ul className="divide-y divide-border">
+        {entities.map((entity) => (
+          <li key={entity.id} className="py-6">
+            <EntityLink entity={entity} />
+            <p className="text-secondary mt-2 max-w-prose">
+              {entity.definition_short}
+            </p>
+            <p className="text-meta text-tertiary mt-2 font-mono">
+              {entity.regions?.join(" · ")}
+              {entity.materials?.length ? ` · ${entity.materials.join(", ")}` : ""}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

@@ -1,50 +1,60 @@
 import type { Metadata } from "next";
-import PageHeader from "@/components/shared/PageHeader";
 
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Project description, methodology, and citation guidance for the Ksour synthesis archive.",
+    "Methodology and citation guidance for the Ksour synthesis archive.",
 };
 
 export default function AboutPage() {
   return (
-    <>
-      <PageHeader
-        eyebrow="Project"
-        title="About"
-        dek="Methodology, scope, and citation guidance."
-      />
-      <article className="mx-auto max-w-prose px-6 py-12 space-y-6 text-ink leading-relaxed">
-        <p>
-          Ksour is a digital synthesis archive of earthen architectural
-          heritage across the Saharan-Maghreb region — Morocco, Mauritania,
-          Algeria, Libya, Tunisia, Mali, and Niger.
-        </p>
-        <p>
-          The archive does not produce original fieldwork. It synthesises
-          existing institutional and academic work, made publicly legible,
-          AI-citable, and structured for institutional readers.
-        </p>
-        <h2 className="font-serif text-2xl pt-6">Methodology</h2>
-        <p>
-          The archive aggregates the corpus that currently lives across
-          ResearchGate, Academia.edu, ISPRS Archives, conference proceedings,
-          Wikipedia, CERKAS reports, and Getty Conservation Institute
-          publications. Every claim is attributed to a library entry by ID.
-        </p>
-        <p>
-          Source-type honesty is observed: archaeological evidence,
-          ethnographic observation, and oral tradition are distinguished where
-          the corpus permits.
-        </p>
-        <h2 className="font-serif text-2xl pt-6">Citation</h2>
-        <p>
-          The archive is published in the public interest as a synthesis of
-          work done by others, with full attribution. Citation guidance and
-          reuse terms will be published with the first release.
-        </p>
+    <div className="max-w-content mx-auto px-6 py-16">
+      <article className="max-w-prose">
+        <header className="mb-12 pb-8 border-b border-border">
+          <p className="font-mono text-meta uppercase tracking-wide text-tertiary mb-4">
+            About
+          </p>
+          <h1 className="font-serif text-4xl text-ink mb-3">Methodology</h1>
+        </header>
+
+        <div className="prose-content">
+          <p>
+            Ksour is a synthesis archive. It does not contain original
+            fieldwork. It indexes, paraphrases, and structurally connects the
+            published institutional and academic record on earthen
+            architectural heritage across the Saharan-Maghreb region.
+          </p>
+
+          <h2>Sources</h2>
+          <p>
+            Every entity links to the sources from which it draws. Where
+            sources disagree, the disagreement is noted. Where the record is
+            silent, the silence is acknowledged rather than filled with
+            speculation.
+          </p>
+
+          <h2>Translation</h2>
+          <p>
+            The corpus exists in English, French, Spanish, Italian, Arabic,
+            and German. Synthesis is published in English. Source-language
+            terms are preserved in the glossary and in entity metadata.
+          </p>
+
+          <h2>Citation</h2>
+          <p>The archive is published in the public interest. Suggested citation:</p>
+          <blockquote>
+            Ksour Archive. (Year). [Entity name]. https://ksour.org/[type]/[slug]
+          </blockquote>
+
+          <h2>Scope</h2>
+          <p>
+            Phase 1 covers Morocco at depth, with sketch coverage of
+            Mauritania, Algeria, Libya, Tunisia, Mali, and Niger. The Moroccan
+            emphasis reflects the density of the published record, not the
+            relative significance of the architecture.
+          </p>
+        </div>
       </article>
-    </>
+    </div>
   );
 }

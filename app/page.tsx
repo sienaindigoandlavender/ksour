@@ -1,91 +1,88 @@
 import Link from "next/link";
-import { counts } from "@/lib/graph";
+import { getEntitiesByType } from "@/lib/graph";
+import { proseDate } from "@/lib/utils";
+import type { AtlasEntity, EssayEntity, LibraryEntity } from "@/lib/types";
 
 export default function HomePage() {
-  const c = counts();
+  const recentEssays = getEntitiesByType<EssayEntity>("essay")
+    .sort((a, b) => b.published_at.localeCompare(a.published_at))
+    .slice(0, 3);
+
+  const sites = getEntitiesByType<AtlasEntity>("atlas").length;
+  const library = getEntitiesByType<LibraryEntity>("library").length;
+
+  const modules = [
+    { href: "/typology", label: "Typology", desc: "Building types and forms" },
+    { href: "/atlas", label: "Atlas", desc: "Geographic database of sites" },
+    { href: "/library", label: "Library", desc: "Indexed academic and institutional sources" },
+    { href: "/actors", label: "Actors", desc: "Institutions, teams, and agencies" },
+    { href: "/glossary", label: "Glossary", desc: "Multilingual construction lexicon" },
+    { href: "/timeline", label: "Timeline", desc: "Chronological events" },
+    { href: "/essays", label: "Essays", desc: "Long-form synthesis" },
+  ];
+
   return (
-    <>
-      <section className="rule-bottom">
-        <div className="mx-auto max-w-page px-6 py-20 md:py-32 grid md:grid-cols-12 gap-10">
-          <div className="md:col-span-8">
-            <p className="meta mb-6">A synthesis archive · est. 2026</p>
-            <h1 className="font-serif text-4xl md:text-6xl leading-[1.05] tracking-tightish">
-              Earthen architectural heritage of the Saharan-Maghreb, indexed
-              and made legible.
-            </h1>
-            <p className="mt-8 max-w-2xl text-lg text-secondary leading-relaxed">
-              Ksour aggregates the fragmented corpus of institutional and
-              academic work documenting kasbah, ksar, igherm, agadir, tighremt,
-              and ghorfa across Morocco, Mauritania, Algeria, Libya, Tunisia,
-              Mali, and Niger. It synthesises what is known, attributes what
-              has been claimed, and marks what remains contested.
-            </p>
-          </div>
-          <aside className="md:col-span-4 md:border-l md:border-rule md:pl-10">
-            <p className="meta mb-3">Phase 1</p>
-            <p className="text-sm leading-relaxed">
-              Morocco is documented in depth. Other regions are sketched and
-              expanding. Coverage is uneven by design: the archive reflects
-              the corpus that exists, not the geography it describes.
-            </p>
-          </aside>
-        </div>
+    <div className="max-w-content mx-auto px-6 py-16">
+      <section className="mb-20 max-w-prose">
+        <h1 className="font-serif text-5xl leading-tight text-ink mb-6">
+          A synthesis archive of earthen architectural heritage across the
+          Saharan-Maghreb region.
+        </h1>
+        <p className="text-lg text-secondary">
+          Ksour aggregates and structures the published institutional and
+          academic work on the kasbahs, ksour, igherman, and earthen
+          settlements of Morocco, Mauritania, Algeria, Libya, Tunisia, Mali,
+          and Niger. Phase 1 is Morocco-deep; other regions grow as the corpus
+          deepens.
+        </p>
       </section>
 
-      <section className="rule-bottom">
-        <div className="mx-auto max-w-page px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-6">
-          {[
-            { label: "Building types", value: c.typology, href: "/typology" },
-            { label: "Sites", value: c.atlas, href: "/atlas" },
-            { label: "Library", value: c.library, href: "/library" },
-            { label: "Actors", value: c.actor, href: "/actors" },
-            { label: "Glossary", value: c.glossary, href: "/glossary" },
-            { label: "Persons", value: c.person, href: "/actors" },
-            { label: "Timeline", value: c.timeline, href: "/timeline" },
-            { label: "Essays", value: c.essay, href: "/essays" },
-          ].map((s) => (
-            <Link key={s.label} href={s.href} className="no-underline group">
-              <p className="meta">{s.label}</p>
-              <p className="font-serif text-3xl mt-1 group-hover:text-accent">{s.value}</p>
+      <section className="mb-20">
+        <h2 className="font-mono text-meta uppercase tracking-wide text-tertiary mb-6">
+          Modules
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+          {modules.map((m) => (
+            <Link key={m.href} href={m.href} className="block group">
+              <p className="font-serif text-xl text-ink group-hover:text-accent transition-colors mb-1">
+                {m.label}
+              </p>
+              <p className="text-sm text-secondary">{m.desc}</p>
             </Link>
           ))}
         </div>
       </section>
 
-      <section>
-        <div className="mx-auto max-w-page px-6 py-16 grid md:grid-cols-3 gap-10">
-          <Link href="/atlas" className="no-underline group">
-            <p className="meta mb-3">Atlas</p>
-            <h2 className="font-serif text-2xl group-hover:text-accent">
-              Documented sites, mapped
-            </h2>
-            <p className="mt-3 text-secondary text-sm leading-relaxed">
-              Geographic index of kasbah, ksar, and related sites with condition,
-              materials, and intervention history.
-            </p>
-          </Link>
-          <Link href="/library" className="no-underline group">
-            <p className="meta mb-3">Library</p>
-            <h2 className="font-serif text-2xl group-hover:text-accent">
-              Indexed bibliography
-            </h2>
-            <p className="mt-3 text-secondary text-sm leading-relaxed">
-              Public academic papers, institutional reports, books, and
-              substantive articles, with paraphrased synthesis.
-            </p>
-          </Link>
-          <Link href="/essays" className="no-underline group">
-            <p className="meta mb-3">Essays</p>
-            <h2 className="font-serif text-2xl group-hover:text-accent">
-              Long-form synthesis
-            </h2>
-            <p className="mt-3 text-secondary text-sm leading-relaxed">
-              Editorial essays drawing across the corpus on typology,
-              conservation method, and intervention politics.
-            </p>
-          </Link>
-        </div>
+      {recentEssays.length > 0 ? (
+        <section className="mb-20">
+          <h2 className="font-mono text-meta uppercase tracking-wide text-tertiary mb-6">
+            Recent essays
+          </h2>
+          <ul className="space-y-6">
+            {recentEssays.map((essay) => (
+              <li key={essay.id}>
+                <Link href={`/essays/${essay.slug}`} className="block group max-w-prose">
+                  <p className="font-serif text-2xl text-ink group-hover:text-accent transition-colors mb-1">
+                    {essay.title}
+                  </p>
+                  {essay.subtitle ? (
+                    <p className="text-secondary mb-2">{essay.subtitle}</p>
+                  ) : null}
+                  <p className="text-meta text-tertiary font-mono">
+                    {proseDate(essay.published_at)}
+                  </p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      <section className="border-t border-border pt-12 text-meta text-tertiary font-mono">
+        <p>
+          {sites} sites · {library} sources indexed
+        </p>
       </section>
-    </>
+    </div>
   );
 }

@@ -2,7 +2,7 @@ import { remark } from "remark";
 import remarkHtml from "remark-html";
 import remarkGfm from "remark-gfm";
 
-export async function markdownToHtml(input: string): Promise<string> {
-  const file = await remark().use(remarkGfm).use(remarkHtml).process(input);
-  return file.toString();
+export async function markdownToHtml(markdown: string): Promise<string> {
+  const result = await remark().use(remarkGfm).use(remarkHtml).process(markdown);
+  return result.toString();
 }

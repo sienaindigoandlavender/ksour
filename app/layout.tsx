@@ -23,30 +23,14 @@ const mono = IBM_Plex_Mono({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ksour.org";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
   title: {
-    default: "Ksour — A synthesis archive of earthen architectural heritage",
-    template: "%s · Ksour",
+    default: "Ksour",
+    template: "%s — Ksour",
   },
   description:
-    "A digital synthesis archive of earthen architectural heritage across the Saharan-Maghreb region: Morocco, Mauritania, Algeria, Libya, Tunisia, Mali, Niger.",
-  openGraph: {
-    type: "website",
-    siteName: "Ksour",
-    url: siteUrl,
-    title: "Ksour — A synthesis archive of earthen architectural heritage",
-    description:
-      "Synthesis archive of earthen architectural heritage across the Saharan-Maghreb region.",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Ksour",
-    description:
-      "Synthesis archive of earthen architectural heritage across the Saharan-Maghreb region.",
-  },
+    "A digital synthesis archive of earthen architectural heritage across the Saharan-Maghreb region.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://ksour.org"),
 };
 
 export default function RootLayout({
@@ -56,9 +40,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
-      <body className="min-h-screen flex flex-col">
+      <body>
         <Header />
-        <main className="flex-1">{children}</main>
+        <main>{children}</main>
         <Footer />
       </body>
     </html>

@@ -1,53 +1,43 @@
 import EntityLink from "@/components/shared/EntityLink";
 import { getEntity } from "@/lib/graph";
-import { labelFor, groupBy } from "@/lib/utils";
-import type { EntityID, EntityType } from "@/lib/types";
+import type { EntityID } from "@/lib/types";
 
-interface Group {
+interface Section {
   label: string;
   ids: EntityID[];
 }
 
 interface Props {
-  groups: Group[];
-  heading?: string;
+  sections: Section[];
 }
 
-export default function ReferencesPanel({ groups, heading = "References" }: Props) {
-  const populated = groups.filter((g) => g.ids && g.ids.length > 0);
-  if (populated.length === 0) return null;
+export default function ReferencesPanel({ sections }: Props) {
+  const nonEmpty = sections.filter((s) => s.ids?.length > 0);
+  if (!nonEmpty.length) return null;
 
   return (
-    <section>
-      <p className="meta mb-4">{heading}</p>
-      <div className="space-y-5 text-sm">
-        {populated.map((group) => {
-          const resolved = group.ids
-            .map((id) => ({ id, e: getEntity(id) }))
-            .filter((x) => x.e);
-          if (resolved.length === 0) return null;
-          const byType = groupBy(resolved, (x) => x.e!.type);
-          return (
-            <div key={group.label}>
-              <p className="meta normal-case tracking-wider text-tertiary mb-2">
-                {group.label}
-              </p>
-              <ul className="space-y-1">
-                {Object.entries(byType).map(([type, items]) => (
-                  <li key={type}>
-                    <span className="meta mr-2">{labelFor(type as EntityType)}</span>
-                    <span className="inline-flex flex-wrap gap-x-3 gap-y-1">
-                      {items.map((x) => (
-                        <EntityLink key={x.id} id={x.id} />
-                      ))}
-                    </span>
+    <div className="border-t border-border pt-6 mt-8">
+      <h2 className="font-mono text-meta uppercase tracking-wide text-tertiary mb-4">
+        References
+      </h2>
+      <div className="space-y-4">
+        {nonEmpty.map((section, i) => (
+          <div key={i}>
+            <p className="text-meta text-tertiary mb-2">{section.label}</p>
+            <ul className="space-y-1 text-sm">
+              {section.ids.map((id) => {
+                const entity = getEntity(id);
+                if (!entity) return null;
+                return (
+                  <li key={id}>
+                    <EntityLink entity={entity} />
                   </li>
-                ))}
-              </ul>
-            </div>
-          );
-        })}
+                );
+              })}
+            </ul>
+          </div>
+        ))}
       </div>
-    </section>
+    </div>
   );
 }

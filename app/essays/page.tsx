@@ -1,8 +1,8 @@
-import Link from "next/link";
 import type { Metadata } from "next";
-import PageHeader from "@/components/shared/PageHeader";
+import Link from "next/link";
 import { getEntitiesByType } from "@/lib/graph";
 import { proseDate } from "@/lib/utils";
+import type { EssayEntity } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Essays",
@@ -10,43 +10,43 @@ export const metadata: Metadata = {
     "Long-form synthesis essays drawing across the corpus on typology, conservation method, and intervention politics.",
 };
 
-export default function EssaysIndex() {
-  const essays = getEntitiesByType("essay").sort(
-    (a, b) => +new Date(b.published_at) - +new Date(a.published_at)
+export default function EssaysIndexPage() {
+  const entities = getEntitiesByType<EssayEntity>("essay").sort((a, b) =>
+    b.published_at.localeCompare(a.published_at)
   );
 
   return (
-    <>
-      <PageHeader
-        eyebrow="Synthesis"
-        title="Essays"
-        dek="Editorial essays on typology, conservation methodology, and the politics of intervention."
-      />
-      <div className="mx-auto max-w-page px-6 py-12">
-        {essays.length === 0 ? (
-          <p className="text-secondary text-sm max-w-prose">
-            No essays yet. The first piece will be published shortly.
-          </p>
-        ) : (
-          <ul className="divide-y divide-rule">
-            {essays.map((e) => (
-              <li key={e.id} className="py-8">
-                <p className="meta">{proseDate(e.published_at)}</p>
-                <Link
-                  href={`/essays/${e.slug}`}
-                  className="block mt-2 font-serif text-3xl no-underline hover:text-accent leading-snug"
-                >
-                  {e.title}
-                </Link>
-                {e.subtitle ? (
-                  <p className="text-secondary mt-2">{e.subtitle}</p>
-                ) : null}
-                <p className="mt-3 max-w-2xl text-sm text-secondary leading-relaxed">{e.dek}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </>
+    <div className="max-w-content mx-auto px-6 py-12">
+      <header className="mb-12">
+        <p className="font-mono text-meta uppercase tracking-wide text-tertiary mb-3">
+          Essays
+        </p>
+        <h1 className="font-serif text-4xl text-ink mb-4">Synthesis</h1>
+        <p className="text-secondary max-w-prose">
+          Editorial essays on typology, conservation methodology, and the
+          politics of intervention — drawing across the indexed corpus.
+        </p>
+      </header>
+      <ul className="space-y-12">
+        {entities.map((essay) => (
+          <li key={essay.id}>
+            <Link href={`/essays/${essay.slug}`} className="block group max-w-prose">
+              <p className="text-meta text-tertiary mb-3 font-mono uppercase tracking-wide">
+                {proseDate(essay.published_at)}
+              </p>
+              <h2 className="font-serif text-3xl text-ink leading-tight group-hover:text-accent transition-colors mb-2">
+                {essay.title}
+              </h2>
+              {essay.subtitle ? (
+                <p className="font-serif text-xl text-secondary mb-3">
+                  {essay.subtitle}
+                </p>
+              ) : null}
+              <p className="text-secondary">{essay.dek}</p>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

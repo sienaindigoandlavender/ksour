@@ -1,14 +1,33 @@
 import Link from "next/link";
-import Nav from "./Nav";
+
+const navItems = [
+  { href: "/typology", label: "Typology" },
+  { href: "/atlas", label: "Atlas" },
+  { href: "/library", label: "Library" },
+  { href: "/actors", label: "Actors" },
+  { href: "/glossary", label: "Glossary" },
+  { href: "/timeline", label: "Timeline" },
+  { href: "/essays", label: "Essays" },
+];
 
 export default function Header() {
   return (
-    <header className="rule-bottom">
-      <div className="mx-auto max-w-page px-6 py-6 flex items-baseline justify-between gap-8">
-        <Link href="/" className="font-serif text-2xl no-underline tracking-tightish">
+    <header className="border-b border-border">
+      <div className="max-w-content mx-auto px-6 py-6 flex items-center justify-between">
+        <Link href="/" className="font-serif text-xl tracking-tight">
           Ksour
         </Link>
-        <Nav />
+        <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="text-secondary hover:text-accent transition-colors"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
       </div>
     </header>
   );

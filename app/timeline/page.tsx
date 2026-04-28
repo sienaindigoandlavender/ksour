@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import PageHeader from "@/components/shared/PageHeader";
+import { getEntitiesByType, getEntity } from "@/lib/graph";
 import EntityLink from "@/components/shared/EntityLink";
-import { getEntitiesByType } from "@/lib/graph";
+import EntityBody from "@/components/entity/EntityBody";
+import type { TimelineEntity } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Timeline",
@@ -9,53 +10,55 @@ export const metadata: Metadata = {
     "Chronological view of restoration interventions, UNESCO listings, key publications, and institutional milestones.",
 };
 
-export default function TimelinePage() {
-  const events = getEntitiesByType("timeline").sort(
+export default function TimelineIndexPage() {
+  const entities = getEntitiesByType<TimelineEntity>("timeline").sort(
     (a, b) => b.year - a.year || (b.month ?? 0) - (a.month ?? 0)
   );
 
   return (
-    <>
-      <PageHeader
-        eyebrow="Chronology"
-        title="Timeline"
-        dek="Restoration interventions, UNESCO listings, key publications, institutions founded, and disasters — by year."
-      />
-      <div className="mx-auto max-w-page px-6 py-12">
-        {events.length === 0 ? (
-          <p className="text-secondary text-sm max-w-prose">
-            No events yet. Timeline nodes will appear here once seeded into{" "}
-            <code>content/timeline/</code>.
-          </p>
-        ) : (
-          <ol className="divide-y divide-rule">
-            {events.map((ev) => (
-              <li key={ev.id} className="py-6 grid md:grid-cols-12 gap-4">
-                <div className="md:col-span-2">
-                  <p className="font-serif text-2xl">{ev.year}</p>
-                  <p className="meta mt-1">{ev.event_type}</p>
-                </div>
-                <div className="md:col-span-10">
-                  <h2 className="font-serif text-xl">{ev.title}</h2>
-                  <div
-                    className="prose-body mt-3 text-secondary text-sm"
-                    dangerouslySetInnerHTML={{ __html: ev.bodyHtml }}
-                  />
-                  {(ev.sites?.length || ev.actors?.length || ev.library_refs?.length) ? (
-                    <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">
-                      {[...(ev.sites ?? []), ...(ev.actors ?? []), ...(ev.library_refs ?? [])].map(
-                        (id) => (
-                          <EntityLink key={id} id={id} showType />
-                        )
-                      )}
-                    </div>
-                  ) : null}
-                </div>
-              </li>
-            ))}
-          </ol>
-        )}
-      </div>
-    </>
+    <div className="max-w-content mx-auto px-6 py-12">
+      <header className="mb-12">
+        <p className="font-mono text-meta uppercase tracking-wide text-tertiary mb-3">
+          Timeline
+        </p>
+        <h1 className="font-serif text-4xl text-ink mb-4">Chronology</h1>
+        <p className="text-secondary max-w-prose">
+          Restoration interventions, UNESCO listings, key publications,
+          institutions founded, and disasters — by year.
+        </p>
+      </header>
+      <ol className="divide-y divide-border">
+        {entities.map((event) => {
+          const refs = [
+            ...(event.sites ?? []),
+            ...(event.actors ?? []),
+            ...(event.library_refs ?? []),
+          ]
+            .map((id) => getEntity(id))
+            .filter(Boolean);
+          return (
+            <li key={event.id} className="py-6 grid grid-cols-[80px_1fr] gap-6">
+              <div>
+                <p className="font-serif text-2xl text-ink">{event.year}</p>
+                <p className="text-meta text-tertiary mt-1 font-mono">
+                  {event.event_type}
+                </p>
+              </div>
+              <div>
+                <h2 className="font-serif text-xl text-ink mb-2">{event.title}</h2>
+                <EntityBody html={event.body} />
+                {refs.length ? (
+                  <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm mt-4">
+                    {refs.map((r) => (
+                      <EntityLink key={r!.id} entity={r!} />
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
   );
 }

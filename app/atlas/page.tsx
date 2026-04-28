@@ -1,37 +1,42 @@
 import type { Metadata } from "next";
-import PageHeader from "@/components/shared/PageHeader";
-import AtlasMap from "@/components/atlas/AtlasMap";
-import AtlasFilters from "@/components/atlas/AtlasFilters";
-import AtlasList from "@/components/atlas/AtlasList";
 import { getEntitiesByType } from "@/lib/graph";
+import EntityLink from "@/components/shared/EntityLink";
+import type { AtlasEntity } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Atlas",
   description:
-    "Geographic index of documented earthen sites across the Saharan-Maghreb region.",
+    "Geographic database of documented earthen heritage sites across the Saharan-Maghreb region.",
 };
 
-export default function AtlasIndex() {
-  const entries = getEntitiesByType("atlas").sort((a, b) =>
+export default function AtlasIndexPage() {
+  const entities = getEntitiesByType<AtlasEntity>("atlas").sort((a, b) =>
     a.name.localeCompare(b.name)
   );
-  const countries = Array.from(new Set(entries.map((e) => e.country))).sort();
-  const conditions = Array.from(new Set(entries.map((e) => e.condition))).sort();
 
   return (
-    <>
-      <PageHeader
-        eyebrow="Map and list"
-        title="Atlas"
-        dek="Documented sites with condition, materials, intervention history, and source attribution."
-      />
-      <AtlasMap token={process.env.NEXT_PUBLIC_MAPBOX_TOKEN} />
-      <div className="mx-auto max-w-page px-6 py-10">
-        <AtlasFilters countries={countries} conditions={conditions} />
-      </div>
-      <div className="mx-auto max-w-page px-6 pb-16">
-        <AtlasList entries={entries} />
-      </div>
-    </>
+    <div className="max-w-content mx-auto px-6 py-12">
+      <header className="mb-12">
+        <p className="font-mono text-meta uppercase tracking-wide text-tertiary mb-3">
+          Atlas
+        </p>
+        <h1 className="font-serif text-4xl text-ink mb-4">Documented Sites</h1>
+        <p className="text-secondary max-w-prose">
+          A geographic database of documented earthen heritage sites across the
+          Saharan-Maghreb region.
+        </p>
+      </header>
+      <ul className="divide-y divide-border">
+        {entities.map((entity) => (
+          <li key={entity.id} className="py-4">
+            <EntityLink entity={entity} />
+            <div className="text-meta text-tertiary mt-1 font-mono">
+              {entity.country} · {entity.condition}
+              {entity.unesco_status ? ` · ${entity.unesco_status}` : ""}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

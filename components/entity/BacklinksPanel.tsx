@@ -1,40 +1,59 @@
-import EntityLink from "@/components/shared/EntityLink";
+import Link from "next/link";
 import { getBacklinks } from "@/lib/graph";
-import { labelFor, groupBy } from "@/lib/utils";
-import type { EntityID, EntityType } from "@/lib/types";
+import type { BacklinkRef, EntityType } from "@/lib/types";
 
 interface Props {
-  id: EntityID;
+  entityId: string;
 }
 
-export default function BacklinksPanel({ id }: Props) {
-  const data = getBacklinks(id);
-  if (!data || data.referencedBy.length === 0) return null;
+const routePrefixes: Record<EntityType, string> = {
+  typology: "/typology",
+  atlas: "/atlas",
+  library: "/library",
+  actor: "/actors",
+  person: "/persons",
+  glossary: "/glossary",
+  timeline: "/timeline",
+  essay: "/essays",
+};
 
-  const byType = groupBy(data.referencedBy, (r) => r.type);
+export default function BacklinksPanel({ entityId }: Props) {
+  const backlinks = getBacklinks(entityId);
+  if (!backlinks.length) return null;
+
+  const grouped: Record<string, BacklinkRef[]> = {};
+  for (const bl of backlinks) {
+    if (!grouped[bl.relation]) grouped[bl.relation] = [];
+    grouped[bl.relation].push(bl);
+  }
 
   return (
-    <section>
-      <p className="meta mb-4">Referenced in</p>
-      <ul className="space-y-3 text-sm">
-        {(Object.entries(byType) as [EntityType, typeof data.referencedBy][]).map(
-          ([type, refs]) => (
-            <li key={type}>
-              <p className="meta normal-case tracking-wider text-tertiary mb-1">
-                {labelFor(type)}
-              </p>
-              <ul className="space-y-1">
-                {refs.map((r) => (
-                  <li key={`${r.id}-${r.relation}`}>
-                    <EntityLink id={r.id} />
-                    <span className="meta ml-2">{r.relation.replace(/_/g, " ")}</span>
+    <div className="border-t border-border pt-6 mt-8">
+      <h2 className="font-mono text-meta uppercase tracking-wide text-tertiary mb-4">
+        Referenced in
+      </h2>
+      <div className="space-y-4">
+        {Object.entries(grouped).map(([relation, refs]) => (
+          <div key={relation}>
+            <p className="text-meta text-tertiary mb-2">{relation}</p>
+            <ul className="space-y-1 text-sm">
+              {refs.map((ref) => {
+                const slug = ref.id.replace(/^[^-]+-/, "");
+                return (
+                  <li key={ref.id}>
+                    <Link
+                      href={`${routePrefixes[ref.type]}/${slug}`}
+                      className="text-ink hover:text-accent border-b border-border hover:border-accent transition-colors"
+                    >
+                      {ref.name}
+                    </Link>
                   </li>
-                ))}
-              </ul>
-            </li>
-          )
-        )}
-      </ul>
-    </section>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
