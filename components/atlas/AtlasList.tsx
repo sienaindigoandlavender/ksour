@@ -1,51 +1,79 @@
+"use client";
+
 import Link from "next/link";
-import type { AtlasEntity } from "@/lib/types";
+import type { AtlasEntity, Condition } from "@/lib/types";
+
+const conditionLabels: Record<Condition, string> = {
+  intact: "Intact",
+  restored: "Restored",
+  partial: "Partial",
+  ruin: "Ruin",
+  unknown: "Unknown",
+};
+
+const conditionColors: Record<Condition, string> = {
+  intact: "#16a34a",
+  restored: "#2563eb",
+  partial: "#ca8a04",
+  ruin: "#dc2626",
+  unknown: "#737373",
+};
 
 interface Props {
-  entries: AtlasEntity[];
+  sites: AtlasEntity[];
+  selectedId: string | null;
+  onSelect: (id: string | null) => void;
 }
 
-export default function AtlasList({ entries }: Props) {
-  if (entries.length === 0) {
+export default function AtlasList({ sites, selectedId, onSelect }: Props) {
+  if (sites.length === 0) {
     return (
-      <p className="text-secondary text-sm">
-        No atlas entries yet. Sites will appear here once content is seeded.
-      </p>
+      <div className="p-6 text-meta text-tertiary">
+        No sites match the current filters.
+      </div>
     );
   }
 
   return (
-    <ul className="divide-y divide-rule">
-      {entries.map((e) => (
-        <li key={e.id} className="py-5 grid md:grid-cols-12 gap-4">
-          <div className="md:col-span-5">
-            <Link
-              href={`/atlas/${e.slug}`}
-              className="font-serif text-xl no-underline hover:text-accent"
-            >
-              {e.name}
-            </Link>
-            {e.alternate_names?.length ? (
-              <p className="text-tertiary text-xs mt-1">
-                {e.alternate_names.join(" · ")}
-              </p>
-            ) : null}
-          </div>
-          <div className="md:col-span-3 text-sm text-secondary">
-            {e.region}
-            <br />
-            <span className="meta">{e.country}</span>
-          </div>
-          <div className="md:col-span-2 text-sm">
-            <span className="meta">{e.condition}</span>
-          </div>
-          <div className="md:col-span-2 text-sm">
-            {e.unesco_status ? (
-              <span className="meta">{e.unesco_status}</span>
-            ) : null}
-          </div>
-        </li>
-      ))}
+    <ul className="divide-y divide-border">
+      {sites.map((site) => {
+        const isSelected = site.id === selectedId;
+        return (
+          <li
+            key={site.id}
+            className={`group cursor-pointer transition-colors ${
+              isSelected ? "bg-codebg" : "hover:bg-codebg"
+            }`}
+            onMouseEnter={() => onSelect(site.id)}
+            onClick={() => onSelect(site.id)}
+          >
+            <div className="px-6 py-4">
+              <div className="flex items-start gap-3">
+                <span
+                  className="block w-2 h-2 rounded-full mt-2 flex-shrink-0"
+                  style={{ background: conditionColors[site.condition] }}
+                />
+                <div className="flex-1 min-w-0">
+                  <Link
+                    href={`/atlas/${site.slug}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="font-serif text-lg text-ink group-hover:text-accent transition-colors block leading-snug"
+                  >
+                    {site.name}
+                  </Link>
+                  <p className="font-mono text-meta text-tertiary uppercase tracking-wide mt-1">
+                    {site.country}
+                    {site.region ? ` · ${site.region}` : ""}
+                    {" · "}
+                    {conditionLabels[site.condition]}
+                    {site.unesco_status === "world-heritage" && " · UNESCO"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </li>
+        );
+      })}
     </ul>
   );
 }
