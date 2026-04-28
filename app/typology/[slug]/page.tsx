@@ -1,76 +1,72 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { getEntityBySlug, getAllSlugs } from "@/lib/graph";
 import EntityHeader from "@/components/entity/EntityHeader";
 import EntityBody from "@/components/entity/EntityBody";
-import EntityShell from "@/components/entity/EntityShell";
 import MetadataPanel from "@/components/entity/MetadataPanel";
 import ReferencesPanel from "@/components/entity/ReferencesPanel";
 import BacklinksPanel from "@/components/entity/BacklinksPanel";
-import { getEntitiesByType, getEntityBySlug } from "@/lib/graph";
-import { jsonLdScript, typologyJsonLd } from "@/lib/schema-org";
-
-interface Props {
-  params: { slug: string };
-}
+import type { TypologyEntity } from "@/lib/types";
 
 export function generateStaticParams() {
-  return getEntitiesByType("typology").map((e) => ({ slug: e.slug }));
+  return getAllSlugs("typology").map((slug) => ({ slug }));
 }
 
-export function generateMetadata({ params }: Props): Metadata {
-  const e = getEntityBySlug("typology", params.slug);
-  if (!e) return { title: "Typology not found" };
+export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
+  const e = getEntityBySlug("typology", params.slug) as TypologyEntity | null;
+  if (!e) return { title: "Not found" };
   return { title: e.name_en, description: e.definition_short };
 }
 
-export default function TypologyDetail({ params }: Props) {
-  const e = getEntityBySlug("typology", params.slug);
-  if (!e) notFound();
+export default function TypologyDetailPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const entity = getEntityBySlug("typology", params.slug) as TypologyEntity | null;
+  if (!entity) notFound();
 
   const altNames = [
-    e.name_ar ? `${e.name_ar} (Arabic)` : null,
-    e.name_french ? `${e.name_french} (French)` : null,
-    e.name_tamazight ? `${e.name_tamazight} (Tamazight)` : null,
+    entity.name_ar ? `${entity.name_ar} (Arabic)` : null,
+    entity.name_french ? `${entity.name_french} (French)` : null,
+    entity.name_tamazight ? `${entity.name_tamazight} (Tamazight)` : null,
   ].filter(Boolean) as string[];
 
+  const metadataFields = [
+    entity.plural_form && { label: "Plural", value: entity.plural_form },
+    altNames.length && { label: "Other names", value: altNames.join(", ") },
+    entity.regions?.length && { label: "Regions", value: entity.regions.join(", ") },
+    entity.materials?.length && { label: "Materials", value: entity.materials.join(", ") },
+    (entity.period_start || entity.period_end) && {
+      label: "Period",
+      value: [entity.period_start, entity.period_end].filter(Boolean).join(" – "),
+    },
+  ].filter(Boolean) as { label: string; value: React.ReactNode }[];
+
+  const referenceSections = [
+    { label: "Often confused with", ids: entity.confusion_with ?? [] },
+    { label: "Key examples", ids: entity.key_examples ?? [] },
+    { label: "Sources", ids: entity.sources ?? [] },
+  ];
+
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={jsonLdScript(typologyJsonLd(e))}
-      />
-      <EntityShell
-        header={
+    <div className="max-w-content mx-auto px-6 py-12">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-12">
+        <div>
           <EntityHeader
-            type={e.type}
-            id={e.id}
-            title={e.name_en}
-            subtitle={e.definition_short}
+            type="typology"
+            id={entity.id}
+            title={entity.name_en}
+            subtitle={entity.definition_short}
           />
-        }
-        body={<EntityBody html={e.bodyHtml} />}
-        side={
-          <>
-            <MetadataPanel
-              rows={[
-                { label: "Plural", value: e.plural_form ?? null },
-                { label: "Other names", value: altNames.length ? altNames.join(", ") : null },
-                { label: "Regions", value: e.regions?.join(", ") },
-                { label: "Materials", value: e.materials?.join(", ") },
-                { label: "Period", value: [e.period_start, e.period_end].filter(Boolean).join(" – ") || null },
-              ]}
-            />
-            <ReferencesPanel
-              groups={[
-                { label: "Often confused with", ids: e.confusion_with ?? [] },
-                { label: "Key examples", ids: e.key_examples ?? [] },
-                { label: "Sources", ids: e.sources ?? [] },
-              ]}
-            />
-            <BacklinksPanel id={e.id} />
-          </>
-        }
-      />
-    </>
+          <EntityBody html={entity.body} />
+        </div>
+        <aside>
+          <MetadataPanel fields={metadataFields} />
+          <ReferencesPanel sections={referenceSections} />
+          <BacklinksPanel entityId={entity.id} />
+        </aside>
+      </div>
+    </div>
   );
 }

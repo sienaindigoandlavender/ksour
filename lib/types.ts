@@ -10,69 +10,37 @@ export type EntityType =
 
 export type EntityID = string;
 
-export type Region =
+export type Condition = "intact" | "partial" | "ruin" | "restored" | "unknown";
+export type UnescoStatus = "world-heritage" | "tentative" | "national-heritage" | null;
+export type Country =
   | "morocco"
   | "tunisia"
-  | "libya"
   | "algeria"
+  | "libya"
   | "mauritania"
   | "mali"
   | "niger";
-
-export type Condition = "intact" | "partial" | "ruin" | "restored" | "unknown";
-export type UnescoStatus = "world-heritage" | "tentative" | "national-heritage" | null;
-
-export type LibraryPublicationType =
-  | "paper"
-  | "book"
-  | "chapter"
-  | "report"
-  | "thesis"
-  | "article";
-
-export type ActorType =
-  | "institution"
-  | "team"
-  | "funder"
-  | "government-agency"
-  | "research-group";
-
-export type GlossaryCategory =
-  | "material"
-  | "technique"
-  | "tool"
-  | "building-element"
-  | "building-type"
-  | "actor-role";
-
-export type TimelineEventType =
-  | "restoration"
-  | "unesco-listing"
-  | "publication"
-  | "institution-founded"
-  | "disaster";
 
 export interface BaseEntity {
   type: EntityType;
   id: EntityID;
   slug: string;
   body: string;
-  bodyHtml: string;
-  sourcePath: string;
+  bodyMarkdown: string;
 }
 
 export interface TypologyEntity extends BaseEntity {
   type: "typology";
   name_en: string;
-  name_ar?: string | null;
-  name_french?: string | null;
-  name_tamazight?: string | null;
-  plural_form?: string | null;
+  name_ar?: string;
+  name_french?: string;
+  name_tamazight?: string;
+  plural_form?: string;
   definition_short: string;
-  regions: Region[];
+  regions: Country[];
   materials: string[];
-  period_start?: string | null;
-  period_end?: string | null;
+  period_start?: string;
+  period_end?: string;
   confusion_with?: EntityID[];
   key_examples?: EntityID[];
   sources?: EntityID[];
@@ -83,19 +51,29 @@ export interface AtlasEntity extends BaseEntity {
   name: string;
   alternate_names?: string[];
   typology: EntityID[];
-  country: Region;
-  region: string;
+  country: Country;
+  region?: string;
   lat: number;
   lng: number;
-  period_built?: string | null;
-  materials: string[];
+  period_built?: string;
+  materials?: string[];
   condition: Condition;
   unesco_status?: UnescoStatus;
-  unesco_year?: number | null;
-  last_intervention_year?: number | null;
+  unesco_year?: number;
+  last_intervention_year?: number;
   documented_by?: EntityID[];
   sources?: EntityID[];
 }
+
+export type LibraryPublicationType =
+  | "paper"
+  | "book"
+  | "chapter"
+  | "report"
+  | "thesis"
+  | "article";
+
+export type LibraryLanguage = "en" | "fr" | "es" | "it" | "ar" | "de";
 
 export interface LibraryEntity extends BaseEntity {
   type: "library";
@@ -104,7 +82,7 @@ export interface LibraryEntity extends BaseEntity {
   year: number;
   publication: string;
   publication_type: LibraryPublicationType;
-  language: string;
+  language: LibraryLanguage;
   doi?: string | null;
   url?: string | null;
   paywalled: boolean;
@@ -114,14 +92,22 @@ export interface LibraryEntity extends BaseEntity {
   topics?: string[];
 }
 
+export type ActorType =
+  | "institution"
+  | "team"
+  | "funder"
+  | "government-agency"
+  | "ngo"
+  | "university";
+
 export interface ActorEntity extends BaseEntity {
   type: "actor";
   name: string;
   full_name?: string;
   actor_type: ActorType;
-  country?: Region | null;
+  country?: Country | null;
   url?: string | null;
-  active_period?: string | null;
+  active_period?: string;
   headquartered_at?: EntityID | null;
   key_publications?: EntityID[];
   works_on_sites?: EntityID[];
@@ -132,22 +118,37 @@ export interface PersonEntity extends BaseEntity {
   name: string;
   affiliation?: EntityID[];
   role?: string;
-  country?: Region | null;
+  country?: Country | null;
   authored?: EntityID[];
 }
+
+export type GlossaryCategory =
+  | "material"
+  | "technique"
+  | "tool"
+  | "building-element"
+  | "building-type"
+  | "actor-role";
 
 export interface GlossaryEntity extends BaseEntity {
   type: "glossary";
   term_en: string;
-  term_arabic?: string | null;
-  term_arabic_translit?: string | null;
-  term_tamazight?: string | null;
-  term_tifinagh?: string | null;
-  term_french?: string | null;
+  term_arabic?: string;
+  term_arabic_translit?: string;
+  term_tamazight?: string;
+  term_tifinagh?: string;
+  term_french?: string;
   category: GlossaryCategory;
   related_terms?: EntityID[];
   referenced_in?: EntityID[];
 }
+
+export type TimelineEventType =
+  | "restoration"
+  | "unesco-listing"
+  | "publication"
+  | "institution-founded"
+  | "disaster";
 
 export interface TimelineEntity extends BaseEntity {
   type: "timeline";
@@ -163,15 +164,15 @@ export interface TimelineEntity extends BaseEntity {
 export interface EssayEntity extends BaseEntity {
   type: "essay";
   title: string;
-  subtitle?: string | null;
+  subtitle?: string;
   dek: string;
-  region_focus?: Region[];
+  region_focus?: Country[];
   topics?: string[];
   referenced_sites?: EntityID[];
   referenced_library?: EntityID[];
   referenced_actors?: EntityID[];
   published_at: string;
-  updated_at?: string;
+  updated_at: string;
 }
 
 export type Entity =
@@ -187,20 +188,17 @@ export type Entity =
 export interface BacklinkRef {
   id: EntityID;
   type: EntityType;
+  name: string;
   relation: string;
 }
 
 export interface Backlinks {
-  [entityId: string]: {
-    referencedBy: BacklinkRef[];
-  };
+  [entityId: string]: BacklinkRef[];
 }
 
 export interface Graph {
-  entities: Record<EntityID, Entity>;
-  byType: Record<EntityType, EntityID[]>;
+  entities: { [id: string]: Entity };
   backlinks: Backlinks;
-  generatedAt: string;
 }
 
 export interface AtlasPoint {
@@ -209,7 +207,7 @@ export interface AtlasPoint {
   lat: number;
   lng: number;
   condition: Condition;
-  country: Region;
+  country: Country;
   typology: EntityID[];
   unesco_status?: UnescoStatus;
 }

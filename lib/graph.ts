@@ -1,75 +1,48 @@
+import graphData from "./graph.json";
 import type {
-  Backlinks,
+  BacklinkRef,
   Entity,
   EntityID,
   EntityType,
   Graph,
-} from "@/lib/types";
+} from "./types";
 
-let cached: Graph | null = null;
+const graph = graphData as unknown as Graph;
 
-function load(): Graph {
-  if (cached) return cached;
-  try {
-    const data = require("./graph.json") as Graph;
-    cached = data;
-    return data;
-  } catch {
-    cached = {
-      entities: {},
-      byType: {
-        typology: [],
-        atlas: [],
-        library: [],
-        actor: [],
-        person: [],
-        glossary: [],
-        timeline: [],
-        essay: [],
-      },
-      backlinks: {},
-      generatedAt: new Date(0).toISOString(),
-    };
-    return cached;
-  }
+export function getEntity(id: EntityID): Entity | null {
+  return graph.entities[id] ?? null;
 }
 
-export function getGraph(): Graph {
-  return load();
+export function getEntitiesByType<T extends Entity>(type: EntityType): T[] {
+  return Object.values(graph.entities).filter((e) => e.type === type) as T[];
 }
 
-export function getEntity(id: EntityID): Entity | undefined {
-  return load().entities[id];
+export function getBacklinks(id: EntityID): BacklinkRef[] {
+  return graph.backlinks[id] ?? [];
 }
 
-export function getEntityBySlug<T extends EntityType>(
-  type: T,
-  slug: string
-): Extract<Entity, { type: T }> | undefined {
-  const g = load();
-  for (const id of g.byType[type] ?? []) {
-    const e = g.entities[id];
-    if (e?.slug === slug) return e as Extract<Entity, { type: T }>;
-  }
-  return undefined;
+export function getEntityBySlug(type: EntityType, slug: string): Entity | null {
+  return (
+    Object.values(graph.entities).find((e) => e.type === type && e.slug === slug) ??
+    null
+  );
 }
 
-export function getEntitiesByType<T extends EntityType>(
-  type: T
-): Array<Extract<Entity, { type: T }>> {
-  const g = load();
-  return (g.byType[type] ?? [])
-    .map((id) => g.entities[id])
-    .filter((e): e is Extract<Entity, { type: T }> => e?.type === type);
-}
-
-export function getBacklinks(id: EntityID): Backlinks[string] | undefined {
-  return load().backlinks[id];
+export function getAllSlugs(type: EntityType): string[] {
+  return getEntitiesByType(type).map((e) => e.slug);
 }
 
 export function counts(): Record<EntityType, number> {
-  const g = load();
-  return Object.fromEntries(
-    Object.entries(g.byType).map(([t, ids]) => [t, ids.length])
-  ) as Record<EntityType, number>;
+  const out: Record<EntityType, number> = {
+    typology: 0,
+    atlas: 0,
+    library: 0,
+    actor: 0,
+    person: 0,
+    glossary: 0,
+    timeline: 0,
+    essay: 0,
+  };
+  for (const e of Object.values(graph.entities)) out[e.type]++;
+  return out;
 }

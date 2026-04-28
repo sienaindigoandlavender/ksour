@@ -3,11 +3,8 @@ interface Props {
 }
 
 export default function EntityBody({ html }: Props) {
-  if (!html.trim()) return null;
+  if (!html?.trim()) return null;
   return (
-    <div
-      className="prose-body text-ink"
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    <div className="prose-content" dangerouslySetInnerHTML={{ __html: html }} />
   );
 }

@@ -1,67 +1,43 @@
-import Link from "next/link";
 import type { Metadata } from "next";
-import PageHeader from "@/components/shared/PageHeader";
 import { getEntitiesByType } from "@/lib/graph";
+import EntityLink from "@/components/shared/EntityLink";
+import type { ActorEntity } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Actors",
   description:
-    "Institutions, conservation teams, and government agencies working on earthen heritage in the Saharan-Maghreb.",
+    "Institutions, conservation teams, government agencies, and funders working on earthen heritage in the Saharan-Maghreb.",
 };
 
-export default function ActorsIndex() {
-  const actors = getEntitiesByType("actor").sort((a, b) => a.name.localeCompare(b.name));
-  const persons = getEntitiesByType("person").sort((a, b) => a.name.localeCompare(b.name));
+export default function ActorsIndexPage() {
+  const entities = getEntitiesByType<ActorEntity>("actor").sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
 
   return (
-    <>
-      <PageHeader
-        eyebrow="Index"
-        title="Actors"
-        dek="Institutions, conservation teams, government agencies, funders — and the individual researchers attached to them."
-      />
-      <div className="mx-auto max-w-page px-6 py-12 grid md:grid-cols-2 gap-12">
-        <section>
-          <p className="meta mb-4">Institutions &amp; teams</p>
-          {actors.length === 0 ? (
-            <p className="text-secondary text-sm">No entries yet.</p>
-          ) : (
-            <ul className="divide-y divide-rule">
-              {actors.map((a) => (
-                <li key={a.id} className="py-4">
-                  <Link
-                    href={`/actors/${a.slug}`}
-                    className="font-serif text-lg no-underline hover:text-accent"
-                  >
-                    {a.name}
-                  </Link>
-                  <p className="meta mt-1">{a.actor_type}{a.country ? ` · ${a.country}` : ""}</p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-        <section>
-          <p className="meta mb-4">Persons</p>
-          {persons.length === 0 ? (
-            <p className="text-secondary text-sm">No entries yet.</p>
-          ) : (
-            <ul className="divide-y divide-rule">
-              {persons.map((p) => (
-                <li key={p.id} className="py-4">
-                  <Link
-                    href={`/persons/${p.slug}`}
-                    className="font-serif text-lg no-underline hover:text-accent"
-                  >
-                    {p.name}
-                  </Link>
-                  {p.role ? <p className="meta mt-1">{p.role}</p> : null}
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      </div>
-    </>
+    <div className="max-w-content mx-auto px-6 py-12">
+      <header className="mb-12">
+        <p className="font-mono text-meta uppercase tracking-wide text-tertiary mb-3">
+          Actors
+        </p>
+        <h1 className="font-serif text-4xl text-ink mb-4">Institutions &amp; Teams</h1>
+        <p className="text-secondary max-w-prose">
+          Government agencies, conservation teams, universities, NGOs, and
+          funders working on earthen heritage in the Saharan-Maghreb.
+        </p>
+      </header>
+      <ul className="divide-y divide-border">
+        {entities.map((entity) => (
+          <li key={entity.id} className="py-4">
+            <EntityLink entity={entity} />
+            <div className="text-meta text-tertiary mt-1 font-mono">
+              {entity.actor_type}
+              {entity.country ? ` · ${entity.country}` : ""}
+              {entity.active_period ? ` · ${entity.active_period}` : ""}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

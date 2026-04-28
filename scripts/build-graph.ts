@@ -1,9 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import { remark } from "remark";
-import remarkHtml from "remark-html";
-import remarkGfm from "remark-gfm";
+import { markdownToHtml } from "../lib/markdown";
 import type {
   AtlasPoint,
   BacklinkRef,
@@ -41,15 +39,51 @@ const ID_PREFIX: Record<EntityType, string> = {
   essay: "essay-",
 };
 
-const REFERENCE_FIELDS: Record<EntityType, string[]> = {
-  typology: ["confusion_with", "key_examples", "sources"],
-  atlas: ["typology", "documented_by", "sources"],
-  library: ["authors", "documents_sites", "discusses_typology", "mentions_actors"],
-  actor: ["headquartered_at", "key_publications", "works_on_sites"],
-  person: ["affiliation", "authored"],
-  glossary: ["related_terms", "referenced_in"],
-  timeline: ["sites", "actors", "library_refs"],
-  essay: ["referenced_sites", "referenced_library", "referenced_actors"],
+interface RelationSpec {
+  field: string;
+  label: string;
+}
+
+const REFERENCE_RELATIONS: Record<EntityType, RelationSpec[]> = {
+  typology: [
+    { field: "confusion_with", label: "confused with" },
+    { field: "key_examples", label: "example of" },
+    { field: "sources", label: "cites" },
+  ],
+  atlas: [
+    { field: "typology", label: "instance of" },
+    { field: "documented_by", label: "documents" },
+    { field: "sources", label: "cites" },
+  ],
+  library: [
+    { field: "authors", label: "authored by" },
+    { field: "documents_sites", label: "documents" },
+    { field: "discusses_typology", label: "discusses" },
+    { field: "mentions_actors", label: "mentions" },
+  ],
+  actor: [
+    { field: "headquartered_at", label: "headquarters of" },
+    { field: "key_publications", label: "published by" },
+    { field: "works_on_sites", label: "worked on by" },
+  ],
+  person: [
+    { field: "affiliation", label: "affiliated with" },
+    { field: "authored", label: "authored by" },
+  ],
+  glossary: [
+    { field: "related_terms", label: "related to" },
+    { field: "referenced_in", label: "references" },
+  ],
+  timeline: [
+    { field: "sites", label: "event at" },
+    { field: "actors", label: "event involving" },
+    { field: "library_refs", label: "event documented in" },
+  ],
+  essay: [
+    { field: "referenced_sites", label: "discussed in" },
+    { field: "referenced_library", label: "cited in" },
+    { field: "referenced_actors", label: "mentioned in" },
+  ],
 };
 
 interface ValidationError {
@@ -58,10 +92,20 @@ interface ValidationError {
 }
 
 const errors: ValidationError[] = [];
-const warnings: string[] = [];
 
-function isStringArray(v: unknown): v is string[] {
-  return Array.isArray(v) && v.every((x) => typeof x === "string");
+function displayName(e: Entity): string {
+  switch (e.type) {
+    case "typology":
+      return e.name_en;
+    case "glossary":
+      return e.term_en;
+    case "library":
+    case "timeline":
+    case "essay":
+      return e.title;
+    default:
+      return (e as { name?: string }).name ?? e.slug;
+  }
 }
 
 async function readEntities(): Promise<Entity[]> {
@@ -82,10 +126,11 @@ async function readEntities(): Promise<Entity[]> {
       const raw = await fs.readFile(full, "utf8");
       const { data, content } = matter(raw);
       const slug = file.replace(/\.(md|mdx)$/, "");
+      const sourcePath = path.relative(ROOT, full);
 
       if (data.type && data.type !== type) {
         errors.push({
-          file: full,
+          file: sourcePath,
           message: `frontmatter type "${data.type}" does not match folder type "${type}"`,
         });
       }
@@ -93,21 +138,20 @@ async function readEntities(): Promise<Entity[]> {
       const id = (data.id as string) ?? `${ID_PREFIX[type]}${slug}`;
       if (!id.startsWith(ID_PREFIX[type])) {
         errors.push({
-          file: full,
+          file: sourcePath,
           message: `id "${id}" must start with prefix "${ID_PREFIX[type]}"`,
         });
       }
 
-      const html = (await remark().use(remarkGfm).use(remarkHtml).process(content)).toString();
+      const html = await markdownToHtml(content);
 
       const entity = {
         ...data,
         type,
         id,
         slug: data.slug ?? slug,
-        body: content,
-        bodyHtml: html,
-        sourcePath: path.relative(ROOT, full),
+        body: html,
+        bodyMarkdown: content,
       } as Entity;
 
       entities.push(entity);
@@ -117,14 +161,14 @@ async function readEntities(): Promise<Entity[]> {
   return entities;
 }
 
-function validate(entities: Entity[]): { byId: Map<EntityID, Entity> } {
+function validateReferences(entities: Entity[]): Map<EntityID, Entity> {
   const byId = new Map<EntityID, Entity>();
 
   for (const e of entities) {
     if (byId.has(e.id)) {
       errors.push({
-        file: e.sourcePath,
-        message: `duplicate id "${e.id}" (also defined in ${byId.get(e.id)!.sourcePath})`,
+        file: e.slug,
+        message: `duplicate id "${e.id}"`,
       });
       continue;
     }
@@ -132,22 +176,22 @@ function validate(entities: Entity[]): { byId: Map<EntityID, Entity> } {
   }
 
   for (const e of entities) {
-    const fields = REFERENCE_FIELDS[e.type] ?? [];
-    for (const field of fields) {
+    const fields = REFERENCE_RELATIONS[e.type] ?? [];
+    for (const { field } of fields) {
       const v = (e as unknown as Record<string, unknown>)[field];
       if (v == null) continue;
       const refs = Array.isArray(v) ? v : [v];
       for (const ref of refs) {
         if (typeof ref !== "string") {
           errors.push({
-            file: e.sourcePath,
+            file: e.id,
             message: `field "${field}" contains a non-string reference`,
           });
           continue;
         }
         if (!byId.has(ref)) {
           errors.push({
-            file: e.sourcePath,
+            file: e.id,
             message: `field "${field}" references unknown entity "${ref}"`,
           });
         }
@@ -155,27 +199,30 @@ function validate(entities: Entity[]): { byId: Map<EntityID, Entity> } {
     }
   }
 
-  return { byId };
+  return byId;
 }
 
-function buildBacklinks(entities: Entity[]): Backlinks {
+function buildBacklinks(entities: Entity[], byId: Map<EntityID, Entity>): Backlinks {
   const backlinks: Backlinks = {};
 
-  const ensure = (id: EntityID) => {
-    if (!backlinks[id]) backlinks[id] = { referencedBy: [] };
-    return backlinks[id];
-  };
-
   for (const e of entities) {
-    const fields = REFERENCE_FIELDS[e.type] ?? [];
-    for (const field of fields) {
+    const fields = REFERENCE_RELATIONS[e.type] ?? [];
+    for (const { field, label } of fields) {
       const v = (e as unknown as Record<string, unknown>)[field];
       if (v == null) continue;
       const refs = Array.isArray(v) ? v : [v];
       for (const ref of refs) {
         if (typeof ref !== "string") continue;
-        const ref_: BacklinkRef = { id: e.id, type: e.type, relation: field };
-        ensure(ref).referencedBy.push(ref_);
+        const target = byId.get(ref);
+        if (!target) continue;
+        if (!backlinks[ref]) backlinks[ref] = [];
+        const blRef: BacklinkRef = {
+          id: e.id,
+          type: e.type,
+          name: displayName(e),
+          relation: label,
+        };
+        backlinks[ref].push(blRef);
       }
     }
   }
@@ -205,27 +252,17 @@ async function main() {
   await fs.mkdir(PUBLIC_DIR, { recursive: true });
 
   const entities = await readEntities();
-  validate(entities);
+  const byId = validateReferences(entities);
 
   if (errors.length > 0) {
     console.error(`\nGraph validation failed with ${errors.length} error(s):\n`);
-    for (const e of errors) {
-      console.error(`  ${e.file}: ${e.message}`);
-    }
+    for (const e of errors) console.error(`  ${e.file}: ${e.message}`);
     process.exit(1);
   }
 
-  const byType = Object.fromEntries(
-    Object.values(ENTITY_DIRS).map((t) => [t, [] as EntityID[]])
-  ) as Record<EntityType, EntityID[]>;
-
-  for (const e of entities) byType[e.type].push(e.id);
-
   const graph: Graph = {
     entities: Object.fromEntries(entities.map((e) => [e.id, e])),
-    byType,
-    backlinks: buildBacklinks(entities),
-    generatedAt: new Date().toISOString(),
+    backlinks: buildBacklinks(entities, byId),
   };
 
   if (validateOnly) {
@@ -233,28 +270,30 @@ async function main() {
     return;
   }
 
-  const meta = {
-    generatedAt: graph.generatedAt,
-    counts: Object.fromEntries(
-      Object.entries(byType).map(([t, ids]) => [t, ids.length])
-    ),
-    backlinks: graph.backlinks,
-  };
-
   await fs.writeFile(path.join(LIB_DIR, "graph.json"), JSON.stringify(graph, null, 2));
-  await fs.writeFile(path.join(LIB_DIR, "graph-meta.json"), JSON.stringify(meta, null, 2));
   await fs.writeFile(
     path.join(PUBLIC_DIR, "atlas-points.json"),
     JSON.stringify(buildAtlasPoints(entities), null, 2)
   );
 
+  const counts: Record<EntityType, number> = {
+    typology: 0,
+    atlas: 0,
+    library: 0,
+    actor: 0,
+    person: 0,
+    glossary: 0,
+    timeline: 0,
+    essay: 0,
+  };
+  for (const e of entities) counts[e.type]++;
+
   console.log(
     `Built graph: ${entities.length} entities ` +
-      Object.entries(byType)
-        .filter(([, ids]) => ids.length > 0)
-        .map(([t, ids]) => `${t}=${ids.length}`)
-        .join(" ") +
-      (warnings.length ? ` (${warnings.length} warning(s))` : "")
+      Object.entries(counts)
+        .filter(([, n]) => n > 0)
+        .map(([t, n]) => `${t}=${n}`)
+        .join(" ")
   );
 }
 
@@ -262,5 +301,3 @@ main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
-
-void isStringArray;

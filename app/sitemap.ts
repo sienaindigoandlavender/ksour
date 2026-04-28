@@ -1,11 +1,20 @@
 import type { MetadataRoute } from "next";
-import { getGraph } from "@/lib/graph";
-import { pathFor } from "@/lib/utils";
+import { getEntitiesByType } from "@/lib/graph";
+import type { EntityType } from "@/lib/types";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ksour.org";
 
+const ROUTE_PREFIX: Record<Exclude<EntityType, "timeline">, string> = {
+  typology: "/typology",
+  atlas: "/atlas",
+  library: "/library",
+  actor: "/actors",
+  person: "/persons",
+  glossary: "/glossary",
+  essay: "/essays",
+};
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const g = getGraph();
   const now = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -20,12 +29,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/about",
   ].map((p) => ({ url: `${SITE}${p}`, lastModified: now }));
 
-  const entityRoutes: MetadataRoute.Sitemap = Object.values(g.entities)
-    .filter((e) => e.type !== "timeline")
-    .map((e) => ({
-      url: `${SITE}${pathFor(e.type, e.slug)}`,
+  const entityRoutes: MetadataRoute.Sitemap = (Object.keys(ROUTE_PREFIX) as Array<
+    keyof typeof ROUTE_PREFIX
+  >).flatMap((type) =>
+    getEntitiesByType(type).map((e) => ({
+      url: `${SITE}${ROUTE_PREFIX[type]}/${e.slug}`,
       lastModified: now,
-    }));
+    }))
+  );
 
   return [...staticRoutes, ...entityRoutes];
 }

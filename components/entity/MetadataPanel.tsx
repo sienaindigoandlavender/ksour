@@ -1,30 +1,30 @@
 import type { ReactNode } from "react";
 
-export interface MetadataRow {
+interface MetadataField {
   label: string;
   value: ReactNode;
 }
 
 interface Props {
-  rows: MetadataRow[];
+  fields: MetadataField[];
 }
 
-export default function MetadataPanel({ rows }: Props) {
-  const visible = rows.filter((r) => r.value !== null && r.value !== undefined && r.value !== "");
-  if (visible.length === 0) return null;
+export default function MetadataPanel({ fields }: Props) {
+  if (!fields.length) return null;
+
   return (
-    <section>
-      <p className="meta mb-4">Metadata</p>
+    <div className="border-t border-border pt-6">
+      <h2 className="font-mono text-meta uppercase tracking-wide text-tertiary mb-4">
+        Metadata
+      </h2>
       <dl className="space-y-3 text-sm">
-        {visible.map((row) => (
-          <div key={row.label} className="grid grid-cols-[7rem_1fr] gap-3">
-            <dt className="meta normal-case tracking-wider text-tertiary pt-px">
-              {row.label}
-            </dt>
-            <dd className="text-ink">{row.value}</dd>
+        {fields.map((field, i) => (
+          <div key={i} className="grid grid-cols-[120px_1fr] gap-2">
+            <dt className="text-tertiary">{field.label}</dt>
+            <dd className="text-ink">{field.value}</dd>
           </div>
         ))}
       </dl>
-    </section>
+    </div>
   );
 }
