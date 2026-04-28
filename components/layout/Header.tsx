@@ -17,7 +17,7 @@ export default function Header() {
         <Link href="/" className="font-serif text-xl tracking-tight">
           Ksour
         </Link>
-        <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+        <nav className="flex flex-wrap gap-x-6 gap-y-2 font-mono text-meta uppercase tracking-wide">
           {navItems.map((item) => (
             <Link
               key={item.href}
