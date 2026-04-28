@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Source_Serif_4, Inter, IBM_Plex_Mono } from "next/font/google";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
 
 const serif = Source_Serif_4({
