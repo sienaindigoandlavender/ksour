@@ -7,6 +7,8 @@ import EntityBody from "@/components/entity/EntityBody";
 import MetadataPanel from "@/components/entity/MetadataPanel";
 import ReferencesPanel from "@/components/entity/ReferencesPanel";
 import BacklinksPanel from "@/components/entity/BacklinksPanel";
+import JsonLd from "@/components/shared/JsonLd";
+import { personJsonLd } from "@/lib/schema-org";
 import type { PersonEntity } from "@/lib/types";
 
 export function generateStaticParams() {
@@ -16,7 +18,15 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const e = getEntityBySlug("person", params.slug) as PersonEntity | null;
   if (!e) return { title: "Not found" };
-  return { title: e.name, description: e.role ?? "Researcher" };
+  const desc = e.role ?? "Researcher";
+  const path = `/persons/${e.slug}`;
+  return {
+    title: e.name,
+    description: desc,
+    alternates: { canonical: path },
+    openGraph: { type: "profile", url: path, title: `${e.name} — Ksour`, description: desc },
+    twitter: { card: "summary", title: e.name, description: desc },
+  };
 }
 
 export default function PersonDetailPage({
@@ -50,6 +60,7 @@ export default function PersonDetailPage({
 
   return (
     <div className="max-w-content mx-auto px-6 py-12">
+      <JsonLd data={personJsonLd(entity)} />
       <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-12">
         <div>
           <EntityHeader type="person" id={entity.id} title={entity.name} />

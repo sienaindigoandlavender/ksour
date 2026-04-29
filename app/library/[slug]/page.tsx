@@ -7,6 +7,8 @@ import EntityBody from "@/components/entity/EntityBody";
 import MetadataPanel from "@/components/entity/MetadataPanel";
 import ReferencesPanel from "@/components/entity/ReferencesPanel";
 import BacklinksPanel from "@/components/entity/BacklinksPanel";
+import JsonLd from "@/components/shared/JsonLd";
+import { libraryJsonLd } from "@/lib/schema-org";
 import type { LibraryEntity } from "@/lib/types";
 
 export function generateStaticParams() {
@@ -16,7 +18,20 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const e = getEntityBySlug("library", params.slug) as LibraryEntity | null;
   if (!e) return { title: "Not found" };
-  return { title: e.title, description: `${e.publication}, ${e.year}` };
+  const desc = `${e.publication}, ${e.year}`;
+  const path = `/library/${e.slug}`;
+  return {
+    title: e.title,
+    description: desc,
+    alternates: { canonical: path },
+    openGraph: {
+      type: "article",
+      url: path,
+      title: `${e.title} — Ksour`,
+      description: desc,
+    },
+    twitter: { card: "summary", title: e.title, description: desc },
+  };
 }
 
 export default function LibraryDetailPage({
@@ -74,6 +89,7 @@ export default function LibraryDetailPage({
 
   return (
     <div className="max-w-content mx-auto px-6 py-12">
+      <JsonLd data={libraryJsonLd(entity)} />
       <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-12">
         <div>
           <EntityHeader type="library" id={entity.id} title={entity.title} />

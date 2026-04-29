@@ -6,6 +6,8 @@ import EntityBody from "@/components/entity/EntityBody";
 import MetadataPanel from "@/components/entity/MetadataPanel";
 import ReferencesPanel from "@/components/entity/ReferencesPanel";
 import BacklinksPanel from "@/components/entity/BacklinksPanel";
+import JsonLd from "@/components/shared/JsonLd";
+import { essayJsonLd } from "@/lib/schema-org";
 import type { EssayEntity } from "@/lib/types";
 import { proseDate } from "@/lib/utils";
 
@@ -16,7 +18,28 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const e = getEntityBySlug("essay", params.slug) as EssayEntity | null;
   if (!e) return { title: "Not found" };
-  return { title: e.title, description: e.dek };
+  const path = `/essays/${e.slug}`;
+  return {
+    title: e.title,
+    description: e.dek,
+    alternates: { canonical: path },
+    keywords: e.topics,
+    authors: [{ name: "Ksour Archive" }],
+    openGraph: {
+      type: "article",
+      url: path,
+      title: `${e.title} — Ksour`,
+      description: e.dek,
+      publishedTime: e.published_at,
+      modifiedTime: e.updated_at ?? e.published_at,
+      tags: e.topics,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: e.title,
+      description: e.dek,
+    },
+  };
 }
 
 export default function EssayDetailPage({
@@ -49,6 +72,7 @@ export default function EssayDetailPage({
 
   return (
     <article className="max-w-content mx-auto px-6 py-12">
+      <JsonLd data={essayJsonLd(entity)} />
       <div className="max-w-prose mx-auto">
         <EntityHeader
           type="essay"
