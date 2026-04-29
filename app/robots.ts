@@ -26,6 +26,5 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: "Amazonbot", allow: "/" },
     ],
     sitemap: `${SITE}/sitemap.xml`,
-    host: SITE,
   };
 }

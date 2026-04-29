@@ -43,13 +43,20 @@ export function websiteJsonLd() {
   };
 }
 
+function firstLine(markdown: string, max = 280): string | undefined {
+  const line = markdown.split("\n").find((l) => l.trim());
+  if (!line) return undefined;
+  const trimmed = line.trim().replace(/^#+\s*/, "");
+  return trimmed.length > max ? `${trimmed.slice(0, max - 1)}…` : trimmed;
+}
+
 export function atlasJsonLd(e: AtlasEntity) {
   return {
     "@context": "https://schema.org",
     "@type": ["LandmarksOrHistoricalBuildings", "Place"],
     name: e.name,
     alternateName: e.alternate_names,
-    description: e.alternate_names?.join(", "),
+    description: firstLine(e.bodyMarkdown),
     address: {
       "@type": "PostalAddress",
       addressCountry: e.country,
@@ -72,7 +79,7 @@ export function libraryJsonLd(e: LibraryEntity) {
     "@context": "https://schema.org",
     "@type": type,
     name: e.title,
-    headline: e.title,
+    headline: type === "ScholarlyArticle" ? e.title : undefined,
     datePublished: String(e.year),
     inLanguage: e.language,
     isAccessibleForFree: !e.paywalled,
@@ -166,6 +173,36 @@ export function timelineJsonLd(e: TimelineEntity) {
     startDate: e.month
       ? `${e.year}-${String(e.month).padStart(2, "0")}`
       : String(e.year),
+  };
+}
+
+export function collectionJsonLd(opts: {
+  name: string;
+  description: string;
+  path: string;
+  items?: { name: string; url: string }[];
+}) {
+  const base = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: opts.name,
+    description: opts.description,
+    url: url(opts.path),
+    isPartOf: { "@type": "WebSite", name: "Ksour", url: SITE },
+  };
+  if (!opts.items) return base;
+  return {
+    ...base,
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: opts.items.length,
+      itemListElement: opts.items.map((it, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: it.url.startsWith("http") ? it.url : url(it.url),
+        name: it.name,
+      })),
+    },
   };
 }
 
