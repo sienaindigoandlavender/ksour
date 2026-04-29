@@ -7,6 +7,8 @@ import EntityBody from "@/components/entity/EntityBody";
 import MetadataPanel from "@/components/entity/MetadataPanel";
 import ReferencesPanel from "@/components/entity/ReferencesPanel";
 import BacklinksPanel from "@/components/entity/BacklinksPanel";
+import JsonLd from "@/components/shared/JsonLd";
+import { atlasJsonLd } from "@/lib/schema-org";
 import type { AtlasEntity } from "@/lib/types";
 
 const AtlasInsetMap = dynamic(
@@ -21,7 +23,20 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const e = getEntityBySlug("atlas", params.slug) as AtlasEntity | null;
   if (!e) return { title: "Not found" };
-  return { title: e.name, description: [e.region, e.country].filter(Boolean).join(", ") };
+  const desc = [e.region, e.country].filter(Boolean).join(", ");
+  const path = `/atlas/${e.slug}`;
+  return {
+    title: e.name,
+    description: desc,
+    alternates: { canonical: path },
+    openGraph: {
+      type: "article",
+      url: path,
+      title: `${e.name} — Ksour`,
+      description: desc,
+    },
+    twitter: { card: "summary_large_image", title: e.name, description: desc },
+  };
 }
 
 export default function AtlasDetailPage({
@@ -65,6 +80,7 @@ export default function AtlasDetailPage({
 
   return (
     <div className="max-w-content mx-auto px-6 py-12">
+      <JsonLd data={atlasJsonLd(entity)} />
       <div className="mb-8">
         <AtlasInsetMap lat={entity.lat} lng={entity.lng} name={entity.name} />
       </div>

@@ -6,6 +6,8 @@ import EntityBody from "@/components/entity/EntityBody";
 import MetadataPanel from "@/components/entity/MetadataPanel";
 import ReferencesPanel from "@/components/entity/ReferencesPanel";
 import BacklinksPanel from "@/components/entity/BacklinksPanel";
+import JsonLd from "@/components/shared/JsonLd";
+import { glossaryJsonLd } from "@/lib/schema-org";
 import type { GlossaryEntity } from "@/lib/types";
 
 export function generateStaticParams() {
@@ -15,7 +17,15 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const e = getEntityBySlug("glossary", params.slug) as GlossaryEntity | null;
   if (!e) return { title: "Not found" };
-  return { title: e.term_en, description: `${e.category}` };
+  const desc = `${e.category}`;
+  const path = `/glossary/${e.slug}`;
+  return {
+    title: e.term_en,
+    description: desc,
+    alternates: { canonical: path },
+    openGraph: { type: "article", url: path, title: `${e.term_en} — Ksour`, description: desc },
+    twitter: { card: "summary", title: e.term_en, description: desc },
+  };
 }
 
 export default function GlossaryDetailPage({
@@ -49,6 +59,7 @@ export default function GlossaryDetailPage({
 
   return (
     <div className="max-w-content mx-auto px-6 py-12">
+      <JsonLd data={glossaryJsonLd(entity)} />
       <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-12">
         <div>
           <EntityHeader type="glossary" id={entity.id} title={entity.term_en} />

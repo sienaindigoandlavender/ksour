@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getEntitiesByType } from "@/lib/graph";
 import { proseDate } from "@/lib/utils";
 import HomeAtlasMap from "@/components/home/HomeAtlasMap";
+import JsonLd from "@/components/shared/JsonLd";
+import { organizationJsonLd, websiteJsonLd } from "@/lib/schema-org";
 import type { AtlasEntity, AtlasPoint, EssayEntity, LibraryEntity } from "@/lib/types";
 
 export default function HomePage() {
@@ -36,6 +38,8 @@ export default function HomePage() {
 
   return (
     <div className="max-w-content mx-auto px-6 py-16">
+      <JsonLd data={organizationJsonLd()} />
+      <JsonLd data={websiteJsonLd()} />
       <section className="mb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
         <div className="max-w-prose">
           <h1 className="font-serif text-5xl leading-tight text-ink mb-6">

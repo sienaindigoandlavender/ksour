@@ -7,6 +7,8 @@ import EntityBody from "@/components/entity/EntityBody";
 import MetadataPanel from "@/components/entity/MetadataPanel";
 import ReferencesPanel from "@/components/entity/ReferencesPanel";
 import BacklinksPanel from "@/components/entity/BacklinksPanel";
+import JsonLd from "@/components/shared/JsonLd";
+import { actorJsonLd } from "@/lib/schema-org";
 import type { ActorEntity } from "@/lib/types";
 
 export function generateStaticParams() {
@@ -16,9 +18,15 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const e = getEntityBySlug("actor", params.slug) as ActorEntity | null;
   if (!e) return { title: "Not found" };
+  const title = e.full_name ?? e.name;
+  const desc = `${e.actor_type}${e.country ? `, ${e.country}` : ""}`;
+  const path = `/actors/${e.slug}`;
   return {
-    title: e.full_name ?? e.name,
-    description: `${e.actor_type}${e.country ? `, ${e.country}` : ""}`,
+    title,
+    description: desc,
+    alternates: { canonical: path },
+    openGraph: { type: "profile", url: path, title: `${title} — Ksour`, description: desc },
+    twitter: { card: "summary", title, description: desc },
   };
 }
 
@@ -62,6 +70,7 @@ export default function ActorDetailPage({
 
   return (
     <div className="max-w-content mx-auto px-6 py-12">
+      <JsonLd data={actorJsonLd(entity)} />
       <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-12">
         <div>
           <EntityHeader
