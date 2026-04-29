@@ -33,10 +33,6 @@ export default function Footer() {
         <p className="font-mono uppercase tracking-wide flex flex-wrap items-center gap-x-2 gap-y-1">
           <span>A <span className="text-ink">Slow Morocco</span> Project</span>
           <span aria-hidden>/</span>
-          <span>Darija Dictionary</span>
-          <span aria-hidden>/</span>
-          <span>Riad di Siena</span>
-          <span aria-hidden>/</span>
           <span>Powered by <span className="text-ink">Dancing with Lions</span></span>
         </p>
       </div>
