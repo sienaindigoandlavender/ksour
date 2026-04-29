@@ -3,6 +3,13 @@ import Script from "next/script";
 import { Source_Serif_4, Inter, IBM_Plex_Mono } from "next/font/google";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import {
+  COPYRIGHT_HOLDER,
+  COPYRIGHT_NOTICE_BASE,
+  LICENSE,
+  USAGE_INFO_PATH,
+  copyrightYears,
+} from "@/lib/license";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
 
@@ -91,6 +98,14 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true },
   },
   category: "architecture",
+  other: {
+    "dcterms.rights": COPYRIGHT_NOTICE_BASE,
+    "dcterms.rightsHolder": COPYRIGHT_HOLDER,
+    "dcterms.license": LICENSE.url,
+    "dcterms.accessRights": "public",
+    rights: COPYRIGHT_NOTICE_BASE,
+    "copyright": `© ${copyrightYears()} ${COPYRIGHT_HOLDER}`,
+  },
 };
 
 export default function RootLayout({
@@ -100,6 +115,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
+      <head>
+        <link rel="license" href={LICENSE.url} title={LICENSE.name} />
+        <link rel="canonical-license" href={`${SITE}${USAGE_INFO_PATH}`} />
+      </head>
       <body>
         <Header />
         <main>{children}</main>
