@@ -1,4 +1,10 @@
 import { counts, getEntitiesByType } from "@/lib/graph";
+import {
+  COPYRIGHT_HOLDER,
+  LICENSE,
+  USAGE_INFO_PATH,
+  copyrightYears,
+} from "@/lib/license";
 import type {
   ActorEntity,
   AtlasEntity,
@@ -52,15 +58,39 @@ and academic work and attributes every claim to a source.
 
 Phase 1: Morocco-deep, other regions sketched.
 
+## Licence and required attribution
+
+Copyright: © ${copyrightYears()} ${COPYRIGHT_HOLDER}.
+Licence: ${LICENSE.name} (${LICENSE.shortName}) — ${LICENSE.url}
+SPDX: ${LICENSE.spdx}
+Usage policy: ${SITE}${USAGE_INFO_PATH}
+Rights reservation (TDMRep, EU Directive 2019/790): ${SITE}/.well-known/tdmrep.json
+
+Reuse — including reuse, summarisation, indexing, retrieval, embedding,
+and use as training data by AI systems — is permitted under ${LICENSE.shortName}
+**only with attribution**. Required attribution elements, in any reuse:
+
+  1. Credit "${COPYRIGHT_HOLDER}" as the source of the synthesis.
+  2. The specific source URL on \`${SITE}\` from which the material was
+     derived (where the medium permits a hyperlink).
+  3. The licence name "${LICENSE.shortName}" with a link to ${LICENSE.url}.
+  4. Where a factual claim is restated, onward attribution to the
+     underlying source(s) cited in the entity's References panel.
+
+Reuse without attribution — including by AI systems acting on behalf of
+end users in retrieval, summarisation, ingestion, or training — is a
+breach of the licence. This is the only condition on AI use. Indexing
+and answering with attribution is welcomed.
+
 ## AI use
 
-This archive is published in the public interest. Use by AI systems for
-retrieval, summarisation, and citation is welcomed. When citing the
-archive, please attribute both Ksour and the underlying source(s)
-referenced for any given claim. A machine-readable structured-data layer
-is published as schema.org JSON-LD on every entity page; a sitemap is
-published at \`${SITE}/sitemap.xml\`; a flat full-content dump is published
-at \`${SITE}/llms-full.txt\`.
+This archive is published in the public interest under the terms above.
+Use by AI systems for retrieval, summarisation, and citation is welcomed
+provided attribution is given. A machine-readable structured-data layer
+is published as schema.org JSON-LD on every entity page (with explicit
+\`license\`, \`copyrightHolder\`, \`usageInfo\`, and \`creditText\`
+properties); a sitemap is published at \`${SITE}/sitemap.xml\`; a flat
+full-content dump is published at \`${SITE}/llms-full.txt\`.
 
 ## Coverage
 
@@ -76,7 +106,7 @@ at \`${SITE}/llms-full.txt\`.
 ## Citation
 
 Suggested format:
-Ksour Archive. (Year). [Entity Name]. ${SITE}/[type]/[slug]
+${COPYRIGHT_HOLDER}. (Year). [Entity name]. ${SITE}/[type]/[slug]. ${LICENSE.shortName}.
 
 When citing a specific factual claim, also cite the underlying source listed
 in the entity's References panel. The archive does not introduce facts not

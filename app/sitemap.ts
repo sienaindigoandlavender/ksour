@@ -27,6 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/timeline",
     "/essays",
     "/about",
+    "/use",
   ].map((p) => ({ url: `${SITE}${p}`, lastModified: now }));
 
   const entityRoutes: MetadataRoute.Sitemap = (Object.keys(ROUTE_PREFIX) as Array<

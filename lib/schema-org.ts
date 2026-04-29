@@ -8,6 +8,13 @@ import type {
   TimelineEntity,
   TypologyEntity,
 } from "@/lib/types";
+import {
+  COPYRIGHT_HOLDER,
+  COPYRIGHT_NOTICE_BASE,
+  LICENSE,
+  USAGE_INFO_PATH,
+  copyrightYears,
+} from "@/lib/license";
 
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://ksour.org").replace(/\/$/, "");
 
@@ -17,15 +24,27 @@ function url(path: string) {
 
 const KSOUR_PUBLISHER = {
   "@type": "Organization",
-  name: "Ksour Archive",
+  name: COPYRIGHT_HOLDER,
   url: SITE,
 };
+
+const RIGHTS_PROPERTIES = {
+  license: LICENSE.url,
+  usageInfo: url(USAGE_INFO_PATH),
+  copyrightHolder: KSOUR_PUBLISHER,
+  copyrightYear: copyrightYears(),
+  copyrightNotice: COPYRIGHT_NOTICE_BASE,
+  creditText: COPYRIGHT_HOLDER,
+  creator: KSOUR_PUBLISHER,
+  publisher: KSOUR_PUBLISHER,
+  conditionsOfAccess: `Reuse permitted under ${LICENSE.shortName} with required attribution to ${COPYRIGHT_HOLDER}. See ${url(USAGE_INFO_PATH)}.`,
+} as const;
 
 export function organizationJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Ksour Archive",
+    name: COPYRIGHT_HOLDER,
     url: SITE,
     description:
       "A digital synthesis archive of earthen architectural heritage across the Saharan-Maghreb region.",
@@ -40,6 +59,12 @@ export function websiteJsonLd() {
     url: SITE,
     inLanguage: "en",
     publisher: KSOUR_PUBLISHER,
+    license: LICENSE.url,
+    usageInfo: url(USAGE_INFO_PATH),
+    copyrightHolder: KSOUR_PUBLISHER,
+    copyrightYear: copyrightYears(),
+    copyrightNotice: COPYRIGHT_NOTICE_BASE,
+    creditText: COPYRIGHT_HOLDER,
   };
 }
 
@@ -65,6 +90,7 @@ export function atlasJsonLd(e: AtlasEntity) {
     geo: { "@type": "GeoCoordinates", latitude: e.lat, longitude: e.lng },
     url: url(`/atlas/${e.slug}`),
     isAccessibleForFree: true,
+    ...RIGHTS_PROPERTIES,
   };
 }
 
@@ -89,6 +115,12 @@ export function libraryJsonLd(e: LibraryEntity) {
       ? { "@type": "Organization", name: e.publication }
       : undefined,
     keywords: e.topics?.join(", "),
+    license: LICENSE.url,
+    usageInfo: url(USAGE_INFO_PATH),
+    copyrightHolder: KSOUR_PUBLISHER,
+    copyrightYear: copyrightYears(),
+    copyrightNotice: `Bibliographic synthesis © ${copyrightYears()} ${COPYRIGHT_HOLDER}, licensed ${LICENSE.shortName}. The cited work itself is the property of its respective rights holders.`,
+    creditText: COPYRIGHT_HOLDER,
   };
 }
 
@@ -131,6 +163,7 @@ export function glossaryJsonLd(e: GlossaryEntity) {
     url: url(`/glossary/${e.slug}`),
     termCode: e.slug,
     description: e.bodyMarkdown.split("\n").find((l) => l.trim())?.slice(0, 280),
+    ...RIGHTS_PROPERTIES,
   };
 }
 
@@ -143,6 +176,7 @@ export function typologyJsonLd(e: TypologyEntity) {
     url: url(`/typology/${e.slug}`),
     termCode: e.slug,
     inDefinedTermSet: url("/typology"),
+    ...RIGHTS_PROPERTIES,
   };
 }
 
@@ -162,6 +196,14 @@ export function essayJsonLd(e: EssayEntity) {
     keywords: e.topics?.join(", "),
     isAccessibleForFree: true,
     articleBody: e.bodyMarkdown,
+    license: LICENSE.url,
+    usageInfo: url(USAGE_INFO_PATH),
+    copyrightHolder: KSOUR_PUBLISHER,
+    copyrightYear: copyrightYears(),
+    copyrightNotice: COPYRIGHT_NOTICE_BASE,
+    creditText: COPYRIGHT_HOLDER,
+    creator: KSOUR_PUBLISHER,
+    conditionsOfAccess: RIGHTS_PROPERTIES.conditionsOfAccess,
   };
 }
 
