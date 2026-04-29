@@ -2,12 +2,24 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getEntitiesByType } from "@/lib/graph";
 import { proseDate } from "@/lib/utils";
+import JsonLd from "@/components/shared/JsonLd";
+import { collectionJsonLd } from "@/lib/schema-org";
 import type { EssayEntity } from "@/lib/types";
+
+const DESCRIPTION =
+  "Long-form synthesis essays drawing across the corpus on typology, conservation method, and intervention politics.";
 
 export const metadata: Metadata = {
   title: "Essays",
-  description:
-    "Long-form synthesis essays drawing across the corpus on typology, conservation method, and intervention politics.",
+  description: DESCRIPTION,
+  alternates: { canonical: "/essays" },
+  openGraph: {
+    type: "website",
+    url: "/essays",
+    title: "Essays — Ksour",
+    description: DESCRIPTION,
+  },
+  twitter: { card: "summary_large_image", title: "Essays — Ksour", description: DESCRIPTION },
 };
 
 export default function EssaysIndexPage() {
@@ -17,6 +29,14 @@ export default function EssaysIndexPage() {
 
   return (
     <div className="max-w-content mx-auto px-6 py-12">
+      <JsonLd
+        data={collectionJsonLd({
+          name: "Essays — Ksour",
+          description: DESCRIPTION,
+          path: "/essays",
+          items: entities.map((e) => ({ name: e.title, url: `/essays/${e.slug}` })),
+        })}
+      />
       <header className="mb-12">
         <p className="font-mono text-meta uppercase tracking-wide text-tertiary mb-3">
           Essays

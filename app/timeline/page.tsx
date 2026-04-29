@@ -2,12 +2,24 @@ import type { Metadata } from "next";
 import { getEntitiesByType, getEntity } from "@/lib/graph";
 import EntityLink from "@/components/shared/EntityLink";
 import EntityBody from "@/components/entity/EntityBody";
+import JsonLd from "@/components/shared/JsonLd";
+import { collectionJsonLd } from "@/lib/schema-org";
 import type { TimelineEntity } from "@/lib/types";
+
+const DESCRIPTION =
+  "Chronological view of restoration interventions, UNESCO listings, key publications, and institutional milestones.";
 
 export const metadata: Metadata = {
   title: "Timeline",
-  description:
-    "Chronological view of restoration interventions, UNESCO listings, key publications, and institutional milestones.",
+  description: DESCRIPTION,
+  alternates: { canonical: "/timeline" },
+  openGraph: {
+    type: "website",
+    url: "/timeline",
+    title: "Timeline — Ksour",
+    description: DESCRIPTION,
+  },
+  twitter: { card: "summary_large_image", title: "Timeline — Ksour", description: DESCRIPTION },
 };
 
 export default function TimelineIndexPage() {
@@ -17,6 +29,13 @@ export default function TimelineIndexPage() {
 
   return (
     <div className="max-w-content mx-auto px-6 py-12">
+      <JsonLd
+        data={collectionJsonLd({
+          name: "Timeline — Ksour",
+          description: DESCRIPTION,
+          path: "/timeline",
+        })}
+      />
       <header className="mb-12">
         <p className="font-mono text-meta uppercase tracking-wide text-tertiary mb-3">
           Timeline

@@ -1,12 +1,24 @@
 import type { Metadata } from "next";
 import { getEntitiesByType } from "@/lib/graph";
 import EntityLink from "@/components/shared/EntityLink";
+import JsonLd from "@/components/shared/JsonLd";
+import { collectionJsonLd } from "@/lib/schema-org";
 import type { TypologyEntity } from "@/lib/types";
+
+const DESCRIPTION =
+  "Building types of the Saharan-Maghreb earthen tradition: kasbah, ksar, igherm, agadir, tighremt, ghorfa, and related forms.";
 
 export const metadata: Metadata = {
   title: "Typology",
-  description:
-    "Building types of the Saharan-Maghreb earthen tradition: kasbah, ksar, igherm, agadir, tighremt, ghorfa, and related forms.",
+  description: DESCRIPTION,
+  alternates: { canonical: "/typology" },
+  openGraph: {
+    type: "website",
+    url: "/typology",
+    title: "Typology — Ksour",
+    description: DESCRIPTION,
+  },
+  twitter: { card: "summary_large_image", title: "Typology — Ksour", description: DESCRIPTION },
 };
 
 export default function TypologyIndexPage() {
@@ -16,6 +28,14 @@ export default function TypologyIndexPage() {
 
   return (
     <div className="max-w-content mx-auto px-6 py-12">
+      <JsonLd
+        data={collectionJsonLd({
+          name: "Typology — Ksour",
+          description: DESCRIPTION,
+          path: "/typology",
+          items: entities.map((e) => ({ name: e.name_en, url: `/typology/${e.slug}` })),
+        })}
+      />
       <header className="mb-12">
         <p className="font-mono text-meta uppercase tracking-wide text-tertiary mb-3">
           Typology

@@ -1,12 +1,24 @@
 import type { Metadata } from "next";
 import { getEntitiesByType } from "@/lib/graph";
 import EntityLink from "@/components/shared/EntityLink";
+import JsonLd from "@/components/shared/JsonLd";
+import { collectionJsonLd } from "@/lib/schema-org";
 import type { ActorEntity } from "@/lib/types";
+
+const DESCRIPTION =
+  "Institutions, conservation teams, government agencies, and funders working on earthen heritage in the Saharan-Maghreb.";
 
 export const metadata: Metadata = {
   title: "Actors",
-  description:
-    "Institutions, conservation teams, government agencies, and funders working on earthen heritage in the Saharan-Maghreb.",
+  description: DESCRIPTION,
+  alternates: { canonical: "/actors" },
+  openGraph: {
+    type: "website",
+    url: "/actors",
+    title: "Actors — Ksour",
+    description: DESCRIPTION,
+  },
+  twitter: { card: "summary_large_image", title: "Actors — Ksour", description: DESCRIPTION },
 };
 
 export default function ActorsIndexPage() {
@@ -16,6 +28,17 @@ export default function ActorsIndexPage() {
 
   return (
     <div className="max-w-content mx-auto px-6 py-12">
+      <JsonLd
+        data={collectionJsonLd({
+          name: "Actors — Ksour",
+          description: DESCRIPTION,
+          path: "/actors",
+          items: entities.map((e) => ({
+            name: e.full_name ?? e.name,
+            url: `/actors/${e.slug}`,
+          })),
+        })}
+      />
       <header className="mb-12">
         <p className="font-mono text-meta uppercase tracking-wide text-tertiary mb-3">
           Actors

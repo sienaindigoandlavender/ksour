@@ -1,12 +1,24 @@
 import type { Metadata } from "next";
 import { getEntitiesByType } from "@/lib/graph";
 import EntityLink from "@/components/shared/EntityLink";
+import JsonLd from "@/components/shared/JsonLd";
+import { collectionJsonLd } from "@/lib/schema-org";
 import type { GlossaryEntity } from "@/lib/types";
+
+const DESCRIPTION =
+  "Multilingual lexicon of construction terms — Tamazight, Darija, Arabic, French, English — used across the earthen building tradition.";
 
 export const metadata: Metadata = {
   title: "Glossary",
-  description:
-    "Multilingual lexicon of construction terms — Tamazight, Darija, Arabic, French, English — used across the earthen building tradition.",
+  description: DESCRIPTION,
+  alternates: { canonical: "/glossary" },
+  openGraph: {
+    type: "website",
+    url: "/glossary",
+    title: "Glossary — Ksour",
+    description: DESCRIPTION,
+  },
+  twitter: { card: "summary_large_image", title: "Glossary — Ksour", description: DESCRIPTION },
 };
 
 export default function GlossaryIndexPage() {
@@ -16,6 +28,14 @@ export default function GlossaryIndexPage() {
 
   return (
     <div className="max-w-content mx-auto px-6 py-12">
+      <JsonLd
+        data={collectionJsonLd({
+          name: "Glossary — Ksour",
+          description: DESCRIPTION,
+          path: "/glossary",
+          items: entities.map((e) => ({ name: e.term_en, url: `/glossary/${e.slug}` })),
+        })}
+      />
       <header className="mb-12">
         <p className="font-mono text-meta uppercase tracking-wide text-tertiary mb-3">
           Glossary
