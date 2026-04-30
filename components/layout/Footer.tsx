@@ -33,7 +33,7 @@ export default function Footer() {
         <p className="font-mono uppercase tracking-wide flex flex-wrap items-center gap-x-2 gap-y-1">
           <span>A <span className="text-ink">Slow Morocco</span> Project</span>
           <span aria-hidden>/</span>
-          <span>Powered by <span className="text-ink">Dancing with Lions</span></span>
+          <span>Powered by <a href="https://dancewithlions.com" target="_blank" rel="noreferrer" className="text-ink hover:text-accent transition-colors">Dancing with Lions</a></span>
         </p>
       </div>
     </footer>
