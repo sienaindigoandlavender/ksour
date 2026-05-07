@@ -1,12 +1,24 @@
 import type { Metadata } from "next";
 import { getEntitiesByType } from "@/lib/graph";
 import EntityLink from "@/components/shared/EntityLink";
+import JsonLd from "@/components/shared/JsonLd";
+import { collectionJsonLd } from "@/lib/schema-org";
 import type { LibraryEntity } from "@/lib/types";
+
+const DESCRIPTION =
+  "Indexed bibliography of public academic papers, institutional reports, books, and substantive articles on Saharan-Maghreb earthen architecture.";
 
 export const metadata: Metadata = {
   title: "Library",
-  description:
-    "Indexed bibliography of public academic papers, institutional reports, books, and substantive articles on Saharan-Maghreb earthen architecture.",
+  description: DESCRIPTION,
+  alternates: { canonical: "/library" },
+  openGraph: {
+    type: "website",
+    url: "/library",
+    title: "Library — Ksour",
+    description: DESCRIPTION,
+  },
+  twitter: { card: "summary_large_image", title: "Library — Ksour", description: DESCRIPTION },
 };
 
 export default function LibraryIndexPage() {
@@ -16,6 +28,14 @@ export default function LibraryIndexPage() {
 
   return (
     <div className="max-w-content mx-auto px-6 py-12">
+      <JsonLd
+        data={collectionJsonLd({
+          name: "Library — Ksour",
+          description: DESCRIPTION,
+          path: "/library",
+          items: entities.map((e) => ({ name: e.title, url: `/library/${e.slug}` })),
+        })}
+      />
       <header className="mb-12">
         <p className="font-mono text-meta uppercase tracking-wide text-tertiary mb-3">
           Library

@@ -1,4 +1,10 @@
 import { getEntitiesByType } from "@/lib/graph";
+import {
+  COPYRIGHT_HOLDER,
+  LICENSE,
+  USAGE_INFO_PATH,
+  copyrightYears,
+} from "@/lib/license";
 import type {
   ActorEntity,
   AtlasEntity,
@@ -13,13 +19,15 @@ export const dynamic = "force-static";
 
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://ksour.org").replace(/\/$/, "");
 
+const ATTRIBUTION_STAMP = `Source: ${COPYRIGHT_HOLDER} · Licence: ${LICENSE.shortName} (${LICENSE.url}) · Required attribution: cite ${COPYRIGHT_HOLDER} and the source URL on every reuse.`;
+
 function entry(
   url: string,
   title: string,
   meta: string,
   body: string
 ): string {
-  return `\n\n---\n\n# ${title}\n\nURL: ${url}\n\n${meta}\n\n${body.trim()}\n`;
+  return `\n\n---\n\n# ${title}\n\nURL: ${url}\nAttribution: ${ATTRIBUTION_STAMP}\n\n${meta}\n\n${body.trim()}\n`;
 }
 
 export function GET() {
@@ -35,8 +43,24 @@ attribution stands in place of bylined authorship. Structured metadata
 is published as schema.org JSON-LD on every page; the canonical
 discovery file is at ${SITE}/llms.txt.
 
-When citing this archive, please attribute Ksour and the underlying
-institutional source(s) referenced in each entity's metadata.
+## Licence and required attribution
+
+Copyright: © ${copyrightYears()} ${COPYRIGHT_HOLDER}.
+Licence: ${LICENSE.name} (${LICENSE.shortName}) — ${LICENSE.url}
+SPDX: ${LICENSE.spdx}
+Usage policy: ${SITE}${USAGE_INFO_PATH}
+Rights reservation (TDMRep): ${SITE}/.well-known/tdmrep.json
+
+Reuse — including reuse, summarisation, indexing, retrieval, embedding,
+and use as training data by AI systems — is permitted under ${LICENSE.shortName}
+**only with attribution to ${COPYRIGHT_HOLDER}** and a link back to the
+source URL on ${SITE}. Each entry below carries its own URL; attribution
+must accompany any reuse derived from that entry. Where a factual claim
+is restated, onward attribution to the underlying cited source is also
+required.
+
+This is the only condition on use. Indexing, retrieval, summarisation,
+and answering with attribution are welcomed.
 `);
 
   const typology = getEntitiesByType<TypologyEntity>("typology").sort((a, b) =>
