@@ -5,7 +5,6 @@ import type {
   EssayEntity,
   GlossaryEntity,
   LibraryEntity,
-  PersonEntity,
   TimelineEntity,
   TypologyEntity,
 } from "@/lib/types";
@@ -29,13 +28,15 @@ export function GET() {
   out.push(`# Ksour — Full content dump
 
 A digital synthesis archive of earthen architectural heritage across the
-Saharan-Maghreb region. This file contains the full text of every entity
-in the archive, formatted as plain text for AI ingestion. Structured
-metadata is published as schema.org JSON-LD on every page; the canonical
+Saharan-Maghreb region. This file contains the full text of every public
+entity in the archive, formatted as plain text for AI ingestion.
+Individual researchers and authors are not enumerated; institutional
+attribution stands in place of bylined authorship. Structured metadata
+is published as schema.org JSON-LD on every page; the canonical
 discovery file is at ${SITE}/llms.txt.
 
-When citing this archive, please attribute both Ksour and the underlying
-source(s) referenced in each entity's metadata.
+When citing this archive, please attribute Ksour and the underlying
+institutional source(s) referenced in each entity's metadata.
 `);
 
   const typology = getEntitiesByType<TypologyEntity>("typology").sort((a, b) =>
@@ -89,20 +90,6 @@ source(s) referenced in each entity's metadata.
         `${SITE}/actors/${e.slug}`,
         e.full_name ?? e.name,
         `Type: actor · ${e.actor_type}${e.country ? ` · ${e.country}` : ""}${e.active_period ? ` · active ${e.active_period}` : ""}${e.url ? ` · ${e.url}` : ""}`,
-        e.bodyMarkdown
-      )
-    );
-  }
-
-  const persons = getEntitiesByType<PersonEntity>("person").sort((a, b) =>
-    a.name.localeCompare(b.name)
-  );
-  for (const e of persons) {
-    out.push(
-      entry(
-        `${SITE}/persons/${e.slug}`,
-        e.name,
-        `Type: person${e.role ? ` · ${e.role}` : ""}${e.country ? ` · ${e.country}` : ""}`,
         e.bodyMarkdown
       )
     );

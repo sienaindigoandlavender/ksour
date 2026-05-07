@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getEntityBySlug, getAllSlugs, getEntity } from "@/lib/graph";
-import EntityLink from "@/components/shared/EntityLink";
+import { getEntityBySlug, getAllSlugs } from "@/lib/graph";
 import EntityHeader from "@/components/entity/EntityHeader";
 import EntityBody from "@/components/entity/EntityBody";
 import MetadataPanel from "@/components/entity/MetadataPanel";
@@ -42,10 +41,6 @@ export default function LibraryDetailPage({
   const entity = getEntityBySlug("library", params.slug) as LibraryEntity | null;
   if (!entity) notFound();
 
-  const authorsList = (entity.authors ?? [])
-    .map((id) => getEntity(id))
-    .filter(Boolean);
-
   const metadataFields = [
     { label: "Year", value: String(entity.year) },
     { label: "Publication", value: entity.publication },
@@ -66,18 +61,6 @@ export default function LibraryDetailPage({
       ),
     },
     { label: "Paywalled", value: entity.paywalled ? "Yes" : "No" },
-    authorsList.length && {
-      label: "Authors",
-      value: (
-        <ul className="space-y-1">
-          {authorsList.map((p) => (
-            <li key={p!.id}>
-              <EntityLink entity={p!} />
-            </li>
-          ))}
-        </ul>
-      ),
-    },
     entity.topics?.length && { label: "Topics", value: entity.topics.join(", ") },
   ].filter(Boolean) as { label: string; value: React.ReactNode }[];
 

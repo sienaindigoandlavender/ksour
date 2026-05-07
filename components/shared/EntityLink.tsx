@@ -1,12 +1,13 @@
 import Link from "next/link";
 import type { Entity, EntityType } from "@/lib/types";
+import { isPublic } from "@/lib/graph";
 
 const routePrefixes: Record<EntityType, string> = {
   typology: "/typology",
   atlas: "/atlas",
   library: "/library",
   actor: "/actors",
-  person: "/persons",
+  person: "",
   glossary: "/glossary",
   timeline: "/timeline",
   essay: "/essays",
@@ -22,14 +23,14 @@ function getDisplayName(entity: Entity): string {
       return entity.title;
     case "actor":
       return entity.name;
-    case "person":
-      return entity.name;
     case "glossary":
       return entity.term_en;
     case "timeline":
       return entity.title;
     case "essay":
       return entity.title;
+    case "person":
+      return entity.name;
   }
 }
 
@@ -38,6 +39,7 @@ interface Props {
 }
 
 export default function EntityLink({ entity }: Props) {
+  if (!isPublic(entity)) return null;
   return (
     <Link
       href={`${routePrefixes[entity.type]}/${entity.slug}`}

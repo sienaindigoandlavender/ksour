@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { getEntitiesByType, getEntity } from "@/lib/graph";
+import { getEntitiesByType } from "@/lib/graph";
 import EntityLink from "@/components/shared/EntityLink";
-import type { LibraryEntity, PersonEntity } from "@/lib/types";
+import type { LibraryEntity } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Library",
@@ -28,32 +28,22 @@ export default function LibraryIndexPage() {
         </p>
       </header>
       <ul className="divide-y divide-border">
-        {entities.map((entity) => {
-          const authors = (entity.authors ?? [])
-            .map((id) => getEntity(id) as PersonEntity | null)
-            .filter(Boolean)
-            .map((p) => p!.name)
-            .join(", ");
-          return (
-            <li key={entity.id} className="py-5">
-              <div className="grid grid-cols-[60px_1fr] gap-4">
-                <div className="font-mono text-meta text-tertiary pt-1">
-                  {entity.year}
-                </div>
-                <div>
-                  <EntityLink entity={entity} />
-                  {authors ? (
-                    <p className="text-sm text-secondary mt-1">{authors}</p>
-                  ) : null}
-                  <p className="text-meta text-tertiary mt-1 font-mono">
-                    {entity.publication} · {entity.publication_type}
-                    {entity.language ? ` · ${entity.language}` : ""}
-                  </p>
-                </div>
+        {entities.map((entity) => (
+          <li key={entity.id} className="py-5">
+            <div className="grid grid-cols-[60px_1fr] gap-4">
+              <div className="font-mono text-meta text-tertiary pt-1">
+                {entity.year}
               </div>
-            </li>
-          );
-        })}
+              <div>
+                <EntityLink entity={entity} />
+                <p className="text-meta text-tertiary mt-1 font-mono">
+                  {entity.publication} · {entity.publication_type}
+                  {entity.language ? ` · ${entity.language}` : ""}
+                </p>
+              </div>
+            </div>
+          </li>
+        ))}
       </ul>
     </div>
   );
