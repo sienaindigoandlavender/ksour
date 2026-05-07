@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getBacklinks } from "@/lib/graph";
+import { getBacklinks, isPublicType } from "@/lib/graph";
 import type { BacklinkRef, EntityType } from "@/lib/types";
 
 interface Props {
@@ -11,14 +11,14 @@ const routePrefixes: Record<EntityType, string> = {
   atlas: "/atlas",
   library: "/library",
   actor: "/actors",
-  person: "/persons",
+  person: "",
   glossary: "/glossary",
   timeline: "/timeline",
   essay: "/essays",
 };
 
 export default function BacklinksPanel({ entityId }: Props) {
-  const backlinks = getBacklinks(entityId);
+  const backlinks = getBacklinks(entityId).filter((bl) => isPublicType(bl.type));
   if (!backlinks.length) return null;
 
   const grouped: Record<string, BacklinkRef[]> = {};

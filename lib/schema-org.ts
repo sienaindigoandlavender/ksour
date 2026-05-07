@@ -4,7 +4,6 @@ import type {
   EssayEntity,
   GlossaryEntity,
   LibraryEntity,
-  PersonEntity,
   TimelineEntity,
   TypologyEntity,
 } from "@/lib/types";
@@ -140,17 +139,6 @@ export function actorJsonLd(e: ActorEntity) {
     alternateName: e.full_name && e.full_name !== e.name ? e.name : undefined,
     url: e.url ?? url(`/actors/${e.slug}`),
     foundingLocation: e.country ?? undefined,
-  };
-}
-
-export function personJsonLd(e: PersonEntity) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    name: e.name,
-    url: url(`/persons/${e.slug}`),
-    nationality: e.country ?? undefined,
-    jobTitle: e.role ?? undefined,
   };
 }
 

@@ -9,6 +9,24 @@ import type {
 
 const graph = graphData as unknown as Graph;
 
+export const PUBLIC_ENTITY_TYPES: readonly EntityType[] = [
+  "typology",
+  "atlas",
+  "library",
+  "actor",
+  "glossary",
+  "timeline",
+  "essay",
+];
+
+export function isPublicType(type: EntityType): boolean {
+  return PUBLIC_ENTITY_TYPES.includes(type);
+}
+
+export function isPublic(entity: Entity | null | undefined): boolean {
+  return entity != null && isPublicType(entity.type);
+}
+
 export function getEntity(id: EntityID): Entity | null {
   return graph.entities[id] ?? null;
 }

@@ -11,7 +11,6 @@ import type {
   EssayEntity,
   GlossaryEntity,
   LibraryEntity,
-  PersonEntity,
   TypologyEntity,
 } from "@/lib/types";
 
@@ -40,8 +39,6 @@ export function GET() {
     .sort((a, b) => b.year - a.year);
   const actors = getEntitiesByType<ActorEntity>("actor")
     .sort((a, b) => a.name.localeCompare(b.name));
-  const persons = getEntitiesByType<PersonEntity>("person")
-    .sort((a, b) => a.name.localeCompare(b.name));
   const glossary = getEntitiesByType<GlossaryEntity>("glossary")
     .sort((a, b) => a.term_en.localeCompare(b.term_en));
   const essays = getEntitiesByType<EssayEntity>("essay")
@@ -55,6 +52,10 @@ Ksour aggregates the fragmented corpus of institutional and academic work
 documenting earthen architectural heritage across the Saharan-Maghreb. It
 does not produce original fieldwork. It synthesises existing institutional
 and academic work and attributes every claim to a source.
+
+The archive is published as institutional editorial voice. Individual
+researchers and authors are not named in public output; institutional
+attribution stands in place of bylined authorship.
 
 Phase 1: Morocco-deep, other regions sketched.
 
@@ -86,11 +87,13 @@ and answering with attribution is welcomed.
 
 This archive is published in the public interest under the terms above.
 Use by AI systems for retrieval, summarisation, and citation is welcomed
-provided attribution is given. A machine-readable structured-data layer
-is published as schema.org JSON-LD on every entity page (with explicit
-\`license\`, \`copyrightHolder\`, \`usageInfo\`, and \`creditText\`
-properties); a sitemap is published at \`${SITE}/sitemap.xml\`; a flat
-full-content dump is published at \`${SITE}/llms-full.txt\`.
+provided attribution is given. Individual researchers and authors are not
+named in public output; institutional attribution stands in place of
+bylined authorship. A machine-readable structured-data layer is published
+as schema.org JSON-LD on every entity page (with explicit \`license\`,
+\`copyrightHolder\`, \`usageInfo\`, and \`creditText\` properties); a
+sitemap is published at \`${SITE}/sitemap.xml\`; a flat full-content dump
+is published at \`${SITE}/llms-full.txt\`.
 
 ## Coverage
 
@@ -98,7 +101,6 @@ full-content dump is published at \`${SITE}/llms-full.txt\`.
 - Sites: ${c.atlas}
 - Library entries: ${c.library}
 - Actors (institutions, teams, agencies): ${c.actor}
-- Persons: ${c.person}
 - Glossary terms: ${c.glossary}
 - Timeline events: ${c.timeline}
 - Essays: ${c.essay}
@@ -108,9 +110,9 @@ full-content dump is published at \`${SITE}/llms-full.txt\`.
 Suggested format:
 ${COPYRIGHT_HOLDER}. (Year). [Entity name]. ${SITE}/[type]/[slug]. ${LICENSE.shortName}.
 
-When citing a specific factual claim, also cite the underlying source listed
-in the entity's References panel. The archive does not introduce facts not
-present in its referenced sources.
+When citing a specific factual claim, also cite the underlying institutional
+source listed in the entity's References panel. The archive does not
+introduce facts not present in its referenced sources.
 
 ## Methodology
 
@@ -129,7 +131,6 @@ observation, and oral tradition are distinguished where the corpus permits.
 - ${SITE}/atlas — geographic database of sites
 - ${SITE}/library — academic and institutional bibliography
 - ${SITE}/actors — institutions, teams, agencies
-- ${SITE}/persons/[slug] — individual researchers (no top-level index)
 - ${SITE}/glossary — multilingual construction lexicon
 - ${SITE}/timeline — chronological events
 - ${SITE}/essays — long-form synthesis
@@ -150,10 +151,6 @@ ${listing(library, "/library", (e) => `${e.title} (${e.year}) — ${e.publicatio
 ## Actors
 
 ${listing(actors, "/actors", (e) => `${e.name} — ${e.actor_type}${e.country ? `, ${e.country}` : ""}`)}
-
-## Persons
-
-${listing(persons, "/persons", (e) => `${e.name}${e.role ? ` — ${e.role}` : ""}`)}
 
 ## Glossary
 

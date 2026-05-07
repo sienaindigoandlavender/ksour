@@ -4,12 +4,11 @@ import type { EntityType } from "@/lib/types";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ksour.org";
 
-const ROUTE_PREFIX: Record<Exclude<EntityType, "timeline">, string> = {
+const ROUTE_PREFIX: Partial<Record<EntityType, string>> = {
   typology: "/typology",
   atlas: "/atlas",
   library: "/library",
   actor: "/actors",
-  person: "/persons",
   glossary: "/glossary",
   essay: "/essays",
 };
