@@ -81,6 +81,119 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
+          <div>
+            <p className="font-mono text-meta uppercase tracking-wide text-tertiary mb-4">
+              Sites
+            </p>
+            <ul className="space-y-2 text-sm">
+              {[
+                { slug: "ait-ben-haddou", name: "Aït Ben Haddou" },
+                { slug: "kasbah-taourirt", name: "Kasbah Taourirt" },
+                { slug: "ghardaia", name: "Ghardaïa" },
+                { slug: "chinguetti", name: "Chinguetti" },
+                { slug: "ouadane", name: "Ouadane" },
+                { slug: "ksar-ouled-soltane", name: "Ksar Ouled Soltane" },
+                { slug: "djenne", name: "Djenné" },
+              ].map((item) => (
+                <li key={item.slug}>
+                  <Link
+                    href={`/atlas/${item.slug}`}
+                    className="text-ink hover:text-accent transition-colors"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <p className="font-mono text-meta uppercase tracking-wide text-tertiary mb-4">
+              Glossary
+            </p>
+            <ul className="space-y-2 text-sm">
+              {[
+                { slug: "pise", name: "Pisé" },
+                { slug: "maalem", name: "Maalem" },
+                { slug: "tighremt", name: "Tighremt" },
+                { slug: "khettara", name: "Khettara" },
+                { slug: "adobe", name: "Adobe" },
+                { slug: "mellah", name: "Mellah" },
+              ].map((item) => (
+                <li key={item.slug}>
+                  <Link
+                    href={`/glossary/${item.slug}`}
+                    className="text-ink hover:text-accent transition-colors"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <p className="font-mono text-meta uppercase tracking-wide text-tertiary mb-4">
+              Building types
+            </p>
+            <ul className="space-y-2 text-sm">
+              {[
+                { slug: "kasbah", name: "Kasbah" },
+                { slug: "ksar", name: "Ksar" },
+                { slug: "tighremt", name: "Tighremt" },
+                { slug: "agadir", name: "Agadir" },
+              ].map((item) => (
+                <li key={item.slug}>
+                  <Link
+                    href={`/typology/${item.slug}`}
+                    className="text-ink hover:text-accent transition-colors"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <p className="font-mono text-meta uppercase tracking-wide text-tertiary mb-4">
+              Library
+            </p>
+            <ul className="space-y-2 text-sm">
+              {[
+                {
+                  slug: "unesco-ait-ben-haddou-1987",
+                  name: "Aït Ben Haddou inscription (UNESCO, 1987)",
+                },
+                {
+                  slug: "boussalh-2018-taourirt",
+                  name: "Kasbah Taourirt conservation plan (2018)",
+                },
+                {
+                  slug: "unesco-mauritanian-ksour-1996",
+                  name: "Mauritanian ksour inscription (UNESCO, 1996)",
+                },
+                {
+                  slug: "unesco-mzab-1982",
+                  name: "M'Zab Valley inscription (UNESCO, 1982)",
+                },
+              ].map((item) => (
+                <li key={item.slug}>
+                  <Link
+                    href={`/library/${item.slug}`}
+                    className="text-ink hover:text-accent transition-colors"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
       {recentEssays.length > 0 ? (
         <section className="mb-20">
           <h2 className="font-mono text-meta uppercase tracking-wide text-tertiary mb-6">
