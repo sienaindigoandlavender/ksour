@@ -4,6 +4,14 @@ export const metadata: Metadata = {
   title: "About",
   description:
     "Methodology and citation guidance for the Ksour synthesis archive.",
+  alternates: { canonical: "/about" },
+  openGraph: {
+    type: "website",
+    url: "/about",
+    title: "About — Ksour",
+    description:
+      "Methodology and citation guidance for the Ksour synthesis archive.",
+  },
 };
 
 export default function AboutPage() {

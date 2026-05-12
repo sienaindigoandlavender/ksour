@@ -49,7 +49,11 @@ export default function HomeAtlasMap({ points }: Props) {
       points.forEach((p) => {
         const slug = p.id.replace(/^atlas-/, "");
 
-        const el = document.createElement("div");
+        const el = document.createElement("a");
+        el.href = `/atlas/${slug}`;
+        el.setAttribute("aria-label", p.name);
+        el.title = p.name;
+        el.style.display = "block";
         el.style.width = "12px";
         el.style.height = "12px";
         el.style.borderRadius = "50%";
@@ -58,7 +62,6 @@ export default function HomeAtlasMap({ points }: Props) {
         el.style.boxShadow = "0 1px 3px rgba(0,0,0,0.25)";
         el.style.cursor = "pointer";
         el.style.transition = "transform 0.15s ease";
-        el.setAttribute("aria-label", p.name);
 
         const popup = new mapboxgl.Popup({
           offset: 12,
@@ -85,9 +88,6 @@ export default function HomeAtlasMap({ points }: Props) {
             marker.togglePopup();
             popupVisible = false;
           }
-        });
-        el.addEventListener("click", () => {
-          window.location.href = `/atlas/${slug}`;
         });
       });
 
