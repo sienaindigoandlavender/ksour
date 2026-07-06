@@ -7,7 +7,7 @@ const routePrefixes: Record<EntityType, string> = {
   atlas: "/atlas",
   library: "/library",
   actor: "/actors",
-  person: "",
+  person: "/persons",
   glossary: "/glossary",
   timeline: "/timeline",
   essay: "/essays",
@@ -40,9 +40,14 @@ interface Props {
 
 export default function EntityLink({ entity }: Props) {
   if (!isPublic(entity)) return null;
+  // Timeline events have no detail pages — link to the chronology itself.
+  const href =
+    entity.type === "timeline"
+      ? "/timeline"
+      : `${routePrefixes[entity.type]}/${entity.slug}`;
   return (
     <Link
-      href={`${routePrefixes[entity.type]}/${entity.slug}`}
+      href={href}
       className="text-ink hover:text-accent border-b border-border hover:border-accent transition-colors"
     >
       {getDisplayName(entity)}
