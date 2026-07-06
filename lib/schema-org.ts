@@ -15,7 +15,7 @@ import {
   copyrightYears,
 } from "@/lib/license";
 
-const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://ksour.org").replace(/\/$/, "");
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.ksour.org").replace(/\/$/, "");
 
 function url(path: string) {
   return `${SITE}${path}`;
