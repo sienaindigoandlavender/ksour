@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { getEntitiesByType } from "@/lib/graph";
 import type { EntityType } from "@/lib/types";
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ksour.org";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.ksour.org";
 
 type Freq = MetadataRoute.Sitemap[number]["changeFrequency"];
 
@@ -19,6 +19,7 @@ const DETAIL: Partial<Record<EntityType, DetailSpec>> = {
   actor: { prefix: "/actors", priority: 0.6, changeFrequency: "monthly" },
   library: { prefix: "/library", priority: 0.6, changeFrequency: "monthly" },
   essay: { prefix: "/essays", priority: 0.6, changeFrequency: "monthly" },
+  person: { prefix: "/persons", priority: 0.5, changeFrequency: "monthly" },
 };
 
 interface StaticSpec {

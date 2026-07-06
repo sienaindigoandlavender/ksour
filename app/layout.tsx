@@ -32,7 +32,7 @@ const mono = IBM_Plex_Mono({
   display: "swap",
 });
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ksour.org";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.ksour.org";
 const GA_ID = "G-DXLPXX7QH2";
 
 export const metadata: Metadata = {
