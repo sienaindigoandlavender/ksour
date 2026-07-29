@@ -16,7 +16,7 @@ import type {
 
 export const dynamic = "force-static";
 
-const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://ksour.org").replace(/\/$/, "");
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.ksour.org").replace(/\/$/, "");
 
 function listing<T extends { slug: string }>(
   items: T[],
