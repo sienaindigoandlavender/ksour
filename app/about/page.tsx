@@ -51,7 +51,7 @@ export default function AboutPage() {
           <h2>Citation</h2>
           <p>The archive is published in the public interest. Suggested citation:</p>
           <blockquote>
-            Ksour Archive. (Year). [Entity name]. https://ksour.org/[type]/[slug]
+            Ksour Archive. (Year). [Entity name]. https://www.ksour.org/[type]/[slug]
           </blockquote>
 
           <h2>Scope</h2>
