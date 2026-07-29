@@ -77,7 +77,7 @@ export default function UsePage() {
             </li>
             <li>
               A link to the specific source URL on{" "}
-              <code>https://ksour.org</code> from which the material was
+              <code>https://www.ksour.org</code> from which the material was
               derived, if reuse is in a context where a hyperlink can be
               rendered.
             </li>
@@ -105,12 +105,12 @@ export default function UsePage() {
           <h2>Suggested citation</h2>
           <p>For a single entity:</p>
           <blockquote>
-            {COPYRIGHT_HOLDER}. (Year). [Entity name]. https://ksour.org/[type]/[slug]. CC BY 4.0.
+            {COPYRIGHT_HOLDER}. (Year). [Entity name]. https://www.ksour.org/[type]/[slug]. CC BY 4.0.
           </blockquote>
           <p>For the archive as a whole:</p>
           <blockquote>
             {COPYRIGHT_HOLDER}. (Year). Ksour: A digital synthesis archive of
-            earthen architectural heritage. https://ksour.org. CC BY 4.0.
+            earthen architectural heritage. https://www.ksour.org. CC BY 4.0.
           </blockquote>
 
           <h2>Use by AI systems</h2>
